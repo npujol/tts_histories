@@ -1,5 +1,6 @@
 import sys
 import re
+from gtts import gTTS
 
 RE_SPACES = re.compile(r"\s+")
 RE_NON_ALPHANUMERIC = re.compile(r"\W+")
@@ -15,14 +16,12 @@ class Story:
     def clean_text(self):
         with open(self.filename) as f:
             content = f.readlines()
-        content = RE_SPACES.sub("", " ".join([x.strip() for x in content]))
+        content = " ".join([x.strip() for x in content])
 
         print(content)
         self.text_story = content
 
     def create_TTS(self):
-        from gtts import gTTS
-
         tts = gTTS(self.text_story, lang=self.language)
         tts.save("{}.mp3".format(self.filename))
         print("Compleat")
