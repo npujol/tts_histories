@@ -31,5 +31,5 @@ class Story:
 if __name__ == "__main__":  # pragma: no coverage
     if sys.argv[1]:
         story = Story(sys.argv[1])
-        # story.create_TTS()
+        story.create_TTS()
 
