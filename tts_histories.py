@@ -15,9 +15,7 @@ class Story:
     def clean_text(self):
         with open(self.filename) as f:
             content = f.readlines()
-        content = RE_SPACES.sub(
-            " ", RE_NON_ALPHANUMERIC.sub("", " ".join([x.strip() for x in content]))
-        )
+        content = RE_SPACES.sub("", " ".join([x.strip() for x in content]))
 
         print(content)
         self.text_story = content
