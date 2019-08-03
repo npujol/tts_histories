@@ -108,7 +108,6 @@ class FileStory:
         with open(self.filename) as f:
             content = f.readlines()
         content = " ".join([x.strip() for x in content])
-        print(content)
         self.text_story = content
 
     def create_TTS(self):
