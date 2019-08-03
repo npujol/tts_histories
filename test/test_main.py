@@ -1,9 +1,8 @@
-from tts_histories import Story
-
+from tts_histories import FileStory
 import os
 
 cwd = os.getcwd()
-s = Story(os.path.join(cwd, "test/test.txt"))
+s = FileStory(os.path.join(cwd, "test/test.txt"))
 
 
 def test_clean_text():
