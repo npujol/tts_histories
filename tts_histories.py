@@ -12,7 +12,6 @@ URL_BASE = "https://www.wattpad.com"
 Chapter = namedtuple("Chapter", field_names=["id", "url", "title", "content"])
 RE_CLEAN = re.compile(r"\/")
 RE_SPACES = re.compile(r"\s+")
-RE_OY = re.compile(r" [y|o] ", re.IGNORECASE)
 
 
 class WattpadStory:
@@ -112,7 +111,8 @@ class FileStory:
 
     def create_TTS(self):
         tts = gTTS(spanish_correction(self.text_story), lang=self.language)
-        tts.save("{self.filename}.mp3")
+        file_name = self.filename.split(".")
+        tts.save("{}.mp3".format(file_name[0]))
         print("Complete tts story")
 
 
@@ -128,16 +128,15 @@ def spanish_correction(text):
         [" y ", ", y "],
         [" o ", ", o "],
         [" pero ", ", pero "],
-        [" por ", ", por "],
-        [" para ", ", para "],
         [" *** ", ""],
     ]
+
     for val in PAUSE_CORRECTIONS:
         text = text.replace(val[0], val[1])
     return text
 
 
-if __name__ == "__main__":  # pragma: no coverage
+if __name__ == "__main__":
     if os.path.isfile(sys.argv[1]):
         story = FileStory(sys.argv[1])
     else:
