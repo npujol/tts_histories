@@ -183,7 +183,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-wp", "--wattpad", help="from Wattapd story", action="store_true"
     )
-    parser.add_argument("-f", "--file", help="from direction", action="store_true")
+    parser.add_argument("-f", "--file", help="from local storage", action="store_true")
     parser.add_argument(
         "-ch", "--chapter", help="from Wattad chapter", action="store_true"
     )
@@ -197,5 +197,5 @@ if __name__ == "__main__":
     elif args.chapter:
         story = WattapadChapter(args.story_dir)
     else:
-        parser.help
+        print("What kind of story is it? Use --help")
     story.create_TTS()
