@@ -198,4 +198,6 @@ if __name__ == "__main__":
         story = WattapadChapter(args.story_dir)
     else:
         print("What kind of story is it? Use --help")
-    story.create_TTS()
+
+    if "story" in locals():
+        story.create_TTS()
