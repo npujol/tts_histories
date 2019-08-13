@@ -117,9 +117,7 @@ class WattapadChapter:
         self.content = self.chapter_content(chapter_html).replace(" y ", ", y ")
 
     def create_TTS(self):
-        tts = gTTS(
-            spanish_correction(self.title + " " + self.content), lang=self.language
-        )
+        tts = gTTS(spanish_correction(self.title + " " + self.content), lang="es")
         tts.save(f"{self.title}.mp3")
         print("Chapter tts story")
 
@@ -181,14 +179,23 @@ def spanish_correction(text):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.parse_args()
+    parser.add_argument("story_dir", help="story source")
+    parser.add_argument(
+        "-wp", "--wattpad", help="from Wattapd story", action="store_true"
+    )
+    parser.add_argument("-f", "--file", help="from direction", action="store_true")
+    parser.add_argument(
+        "-ch", "--chapter", help="from Wattad chapter", action="store_true"
+    )
+    args = parser.parse_args()
 
-    if os.path.isfile(sys.argv[1]):
-        story = FileStory(sys.argv[1])
-    else:
-        story = WattpadStory(sys.argv[1])
+    if args.story_dir and os.path.isfile(args.story_dir):
+        story = FileStory(args.story_dir)
+    elif args.wattpad:
+        story = WattpadStory(args.story_dir)
         story.save_text_story()
+    elif args.chapter:
+        story = WattapadChapter(args.story_dir)
+    else:
+        parser.help
     story.create_TTS()
-
-    chapter = WattapadChapter(sys.argv[1])
-    print(chapter.title)
