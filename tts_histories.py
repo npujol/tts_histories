@@ -2,6 +2,7 @@ import sys
 import re
 import html
 import os
+import argparse
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from gtts import gTTS
@@ -96,6 +97,48 @@ class WattpadStory:
         print("Complete tts story")
 
 
+class WattapadChapter:
+    def __init__(self, url):
+        self.url = url
+        self.title = ""
+        self.content = ""
+        self.extract_info()
+
+    def extract_info(self):
+        chapter_html = get_content(self.url)
+        title = (
+            str(chapter_html.title.string)
+            .encode("ascii", "ignore")
+            .decode("utf-8")
+            .partition("-")[0]
+            .strip()
+        )
+        self.title = RE_CLEAN.sub(" ", title)
+        self.content = self.chapter_content(chapter_html).replace(" y ", ", y ")
+
+    def create_TTS(self):
+        tts = gTTS(
+            spanish_correction(self.title + " " + self.content), lang=self.language
+        )
+        tts.save(f"{self.title}.mp3")
+        print("Chapter tts story")
+
+    def chapter_content(self, chapter_html):
+        content = ""
+        i = 1
+        while i == 1 or (str(i) in chapter_html.title.string):
+            article_texts = chapter_html.findAll(attrs={"data-p-id": True})
+            chapter = "\n".join(
+                html.unescape(t.text).replace("\u2022" * 3, "").strip()
+                for t in article_texts
+            )
+            content += chapter
+            i += 1
+            page = self.url + f"/page/{i}"
+            chapter_html = get_content(page)
+            return content
+
+
 class FileStory:
     def __init__(self, filename, language="es"):
         self.filename = filename
@@ -137,9 +180,15 @@ def spanish_correction(text):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.parse_args()
+
     if os.path.isfile(sys.argv[1]):
         story = FileStory(sys.argv[1])
     else:
         story = WattpadStory(sys.argv[1])
         story.save_text_story()
     story.create_TTS()
+
+    chapter = WattapadChapter(sys.argv[1])
+    print(chapter.title)
