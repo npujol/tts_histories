@@ -1,3 +1,3 @@
 # tts_histories
 
-Create TSS from txt or wattpad histories(Spanisch)
+Create TSS from txt or wattpad histories(default Spanich)
