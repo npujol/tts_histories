@@ -6,11 +6,73 @@ import argparse
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from gtts import gTTS
-from collections import namedtuple
+from recordtype import recordtype
 
+# Available tts languages
+LANGUAGE = [
+    "af-ZA",
+    "sq",
+    "ar-AE",
+    "hy",
+    "bn-BD",
+    "bn-IN",
+    "bs",
+    "my",
+    "ca-ES",
+    "cmn-Hant-TW",
+    "hr-HR",
+    "cs-CZ",
+    "da-DK",
+    "nl-NL",
+    "en-AU",
+    "en-GB",
+    "en-US",
+    "eo",
+    "fil-PH",
+    "fi-FI",
+    "fr-FR",
+    "fr-CA",
+    "de-DE",
+    "el-GR",
+    "gu",
+    "hi-IN",
+    "hu-HU",
+    "is-IS",
+    "id-ID",
+    "it-IT",
+    "ja-JP",
+    "kn",
+    "km",
+    "ko-KR",
+    "la",
+    "lv",
+    "mk",
+    "ml",
+    "mr",
+    "ne",
+    "nb-NO",
+    "pl-PL",
+    "pt-BR",
+    "ro-RO",
+    "ru-RU",
+    "sr-RS",
+    "si",
+    "sk-SK",
+    "es-MX",
+    "es-ES",
+    "sw",
+    "sv-SE",
+    "ta",
+    "te",
+    "th-TH",
+    "tr-TR",
+    "uk-UA",
+    "vi-VN",
+    "cy",
+]
 URL_BASE = "https://www.wattpad.com"
 
-Chapter = namedtuple("Chapter", field_names=["id", "url", "title", "content"])
+Chapter = recordtype("Chapter", field_names=["id", "url", "title", "content"])
 RE_CLEAN = re.compile(r"\/")
 RE_SPACES = re.compile(r"\s+")
 
@@ -187,6 +249,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-ch", "--chapter", help="from Wattad chapter", action="store_true"
     )
+    parser.add_argument(
+        "-l", 
+        "--language", 
+        help="Language for the story", 
+        default="es", type=str, choices=LANGUAGE)
     args = parser.parse_args()
 
     if args.story_dir and os.path.isfile(args.story_dir):
