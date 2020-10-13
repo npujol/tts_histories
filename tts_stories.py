@@ -253,7 +253,8 @@ if __name__ == "__main__":
         "-l", 
         "--language", 
         help="Language for the story", 
-        default="es", type=str, choices=LANGUAGE)
+        default="es", type=str, 
+        choices=LANGUAGE)
     args = parser.parse_args()
 
     if args.story_dir and os.path.isfile(args.story_dir):
