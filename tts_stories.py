@@ -72,7 +72,9 @@ LANGUAGE = [
 ]
 URL_BASE_WATTPAD = "https://www.wattpad.com"
 
-Chapter = recordtype("Chapter", field_names=["id", "url", "title", "content"])
+Chapter = recordtype(
+    "Chapter", field_names=["title", "url", "saved_text", "saved_audio"]
+)
 RE_CLEAN = re.compile(r"\/")
 RE_SPACES = re.compile(r"\s+")
 
@@ -85,80 +87,82 @@ class WattpadStory:
         self.author = ""
         self.summary = ""
         self.chapters = []
-        self.split_story()
+        self.get_info()
+        self.make()
 
-    def split_story(self):
+    def get_info(self):
         html_story = get_content(self.url)
 
-        title = (
-            str(html_story.title.string)
-        )
+        title = str(html_story.title.string)
         self.title = RE_CLEAN.sub(" ", title)
+
         author = html_story.find("a", attrs={"class": "send-author-event on-navigate"})
         self.author = "".join(e.string for e in author)
 
         summary = html_story.find("pre")
         self.summary = "".join(e.string for e in summary)
 
-        index_story = html_story.find_all("li", attrs={"data-part-id": True})
-        for t in index_story:
+        if not os.path.isfile(f"{self.title} Index.txt") or not os.path.isfile(
+            f"{self.title} Summary.txt"
+        ):
+            self.get_chapters(html_story)
+        else:
+            self.load_chapters()
+
+    def get_chapters(self, html_story):
+        story_chapters = html_story.find_all("li", attrs={"data-part-id": True})
+        for ch in story_chapters:
             url_chapter = (
                 URL_BASE_WATTPAD
-                + html.unescape(t.a.get("href")).replace("\u2022" * 3, "").strip()
+                + html.unescape(ch.a.get("href")).replace("\u2022" * 3, "").strip()
             )
             self.chapters.append(
                 Chapter(
-                    t.get("data-part-id"),
+                    RE_SPACES.sub(" ", RE_CLEAN.sub(" ", ch.a.text)),
                     url_chapter,
-                    html.unescape(t.text).replace("\u2022" * 3, "").strip(),
-                    self.chapter_content(url_chapter).replace(" y ", ", y "),
+                    "",
+                    "",
                 )
             )
+        save_text(
+            f"{self.title} Summary", "\n".join([self.title, self.author, self.summary])
+        )
+        save_text(
+            f"{self.title} Index",
+            "\n".join([",".join([val for val in ch]) for ch in self.chapters]),
+        )
 
-    def chapter_content(self, url_chapter):
-        chapter_html = get_content(url_chapter)
-        content = ""
-        i = 1
-        while i == 1 or (str(i) in chapter_html.title.string):
-            article_texts = chapter_html.findAll(attrs={"data-p-id": True})
-            chapter = "\n".join(
-                html.unescape(t.text).replace("\u2022" * 3, "").strip()
-                for t in article_texts
-            )
-            content += chapter
-            i += 1
-            page = url_chapter + f"/page/{i}"
-            chapter_html = get_content(page)
-        return content
+    def load_chapters(self):
+        content_chapters = read_content(f"{self.title} Index.txt")
+        for line in content_chapters.split("\n"):
+            title, url, saved_text, saved_audio = line.split(",")
+            self.chapters.append(Chapter(title, url, saved_text, saved_audio))
 
-    def save_text_story(self):
-        with open(f"{self.title}.txt", "w", encoding="utf8") as outfile:
-            outfile.write("Título ")
-            outfile.write(self.title)
-            outfile.write(" Autor ")
-            outfile.write(self.title)
+    def make(self):
+        for chapter in self.chapters:
+            if chapter.saved_text == "":
+                WattapadChapter(
+                    chapter.url,
+                    self.language,
+                    chapter.title,
+                )
+                chapter.saved_text = f"{chapter.title}.txt"
+                if chapter.saved_audio == "":
+                    WattapadChapter(
+                        chapter.url, self.language, chapter.title, chapter.saved_text
+                    )
+                    chapter.saved_audio = f"{chapter.title}.mp3"
 
-            outfile.write(self.summary)
-            for ch in self.chapters:
-                outfile.write(ch.title)
-                outfile.write(ch.content)
-            print(f"{self.title}.txt")
-
-    def create_TTS(self):
-        for val, ch in enumerate(self.chapters):
-            tts = gTTS(
-                spanish_correction(ch.title + " " + ch.content), lang=self.language
-            )
-            tts.save(f"{self.title} Ch:{val}.mp3")
-            print(f"{self.title} Ch:{val}.mp3")
-
-        print("Complete tts story")
+        save_text(
+            f"{self.title} Index",
+            "\n".join([",".join([val for val in ch]) for ch in self.chapters]),
+        )
 
 
 class WattapadChapter:
-    def __init__(self, url, language="es", filename=None):
+    def __init__(self, url, language="es", title="", filename=None):
         self.url = url
-        self.title = ""
+        self.title = title
         self.text = ""
         self.language = language
         self.filename = filename
@@ -167,7 +171,7 @@ class WattapadChapter:
 
     def make(self):
         if not self.filename and not os.path.isfile(f"{self.title}.txt"):
-            self.filename = save_text(self.title, " ".join([self.title, self.text]))
+            self.filename = save_text(self.title, "\n".join([self.title, self.text]))
         else:
             print(f"{self.title} has been saved")
         if self.filename and not os.path.isfile(f"{self.title}.mp3"):
@@ -177,8 +181,9 @@ class WattapadChapter:
 
     def extract_info(self):
         chapter_html = get_content(self.url)
-        title = str(chapter_html.title.string)       
-        self.title = RE_CLEAN.sub(" ", title)
+        if self.title == "":
+            title = str(chapter_html.title.string)
+            self.title = RE_CLEAN.sub(" ", title)
         self.text = self.get_chapter_text(chapter_html)
 
     def get_chapter_text(self, chapter_html):
@@ -203,7 +208,8 @@ class FileStory:
         self.title = filename.split(".")[0]
         self.language = language
         self.text = read_content(self.filename)
-        create_TTS(self.title, self.text, self.language)    
+        create_TTS(self.title, self.text, self.language)
+
 
 def get_content(url):
     MOZILLA = {"User-Agent": "Mozilla/5.0"}
@@ -211,24 +217,28 @@ def get_content(url):
     html_content = urlopen(req).read()
     return BeautifulSoup(html_content, "html.parser")
 
+
 def read_content(filename):
-    with open(filename) as f:
+    with open(filename, "r", encoding="utf8") as f:
         content = f.readlines()
-    content = " ".join([x.strip() for x in content])
+    content = "\n".join([x.strip() for x in content])
     return content
+
 
 def create_TTS(title, text, language):
     print(f"Init tts story: {title}")
     tts = gTTS(text, lang=language)
-    tts.save("{title}.mp3")
+    tts.save(f"{title}.mp3")
     print(f"Complete tts story: {title}")
 
+
 def save_text(title, text):
-        with open(f"{title}.txt", "w", encoding="utf8") as outfile:
-            print(f"Init save story: {title}")
-            outfile.write(text)
-            print(f"Complete save story: {title}")
-        return f"{title}.txt"
+    with open(f"{title}.txt", "w", encoding="utf8") as outfile:
+        print(f"Init save story: {title}")
+        outfile.write(text)
+        print(f"Complete save story: {title}")
+    return f"{title}.txt"
+
 
 def spanish_correction(text):
     PAUSE_CORRECTIONS = [
@@ -253,11 +263,13 @@ if __name__ == "__main__":
         "-ch", "--chapter", help="from Wattad chapter", action="store_true"
     )
     parser.add_argument(
-        "-l", 
-        "--language", 
-        help="Language for the story", 
-        default="es", type=str, 
-        choices=LANGUAGE)
+        "-l",
+        "--language",
+        help="Language for the story",
+        default="es",
+        type=str,
+        choices=LANGUAGE,
+    )
     args = parser.parse_args()
 
     if args.story_dir and os.path.isfile(args.story_dir):
@@ -268,4 +280,3 @@ if __name__ == "__main__":
         story = WattapadChapter(args.story_dir)
     else:
         print("What kind of story is it? Use --help")
-
