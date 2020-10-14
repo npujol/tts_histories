@@ -70,7 +70,7 @@ LANGUAGE = [
     "vi-VN",
     "cy",
 ]
-URL_BASE = "https://www.wattpad.com"
+URL_BASE_WATTPAD = "https://www.wattpad.com"
 
 Chapter = recordtype("Chapter", field_names=["id", "url", "title", "content"])
 RE_CLEAN = re.compile(r"\/")
@@ -92,10 +92,6 @@ class WattpadStory:
 
         title = (
             str(html_story.title.string)
-            .encode("ascii", "ignore")
-            .decode("utf-8")
-            .partition("-")[0]
-            .strip()
         )
         self.title = RE_CLEAN.sub(" ", title)
         author = html_story.find("a", attrs={"class": "send-author-event on-navigate"})
@@ -107,7 +103,7 @@ class WattpadStory:
         index_story = html_story.find_all("li", attrs={"data-part-id": True})
         for t in index_story:
             url_chapter = (
-                URL_BASE
+                URL_BASE_WATTPAD
                 + html.unescape(t.a.get("href")).replace("\u2022" * 3, "").strip()
             )
             self.chapters.append(
@@ -202,22 +198,10 @@ class WattapadChapter:
 class FileStory:
     def __init__(self, filename, language="es"):
         self.filename = filename
+        self.title = filename.split(".")[0]
         self.language = language
-        self.text_story = ""
-        self.clean_text()
-
-    def clean_text(self):
-        with open(self.filename) as f:
-            content = f.readlines()
-        content = " ".join([x.strip() for x in content])
-        self.text_story = content
-
-    def create_TTS(self):
-        tts = gTTS(spanish_correction(self.text_story), lang=self.language)
-        file_name = self.filename.split(".")
-        tts.save("{}.mp3".format(file_name[0]))
-        print("Complete tts story")
-
+        self.text = read_content(self.filename)
+        create_TTS(self.title, self.text, self.language)    
 
 def get_content(url):
     MOZILLA = {"User-Agent": "Mozilla/5.0"}
@@ -225,6 +209,17 @@ def get_content(url):
     html_content = urlopen(req).read()
     return BeautifulSoup(html_content, "html.parser")
 
+def read_content(filename):
+    with open(filename) as f:
+        content = f.readlines()
+    content = " ".join([x.strip() for x in content])
+    return content
+
+def create_TTS(title, text, language):
+    print("Init tts story: {}".format(title))
+    tts = gTTS(text, lang=language)
+    tts.save("{}.mp3".format(title))
+    print("Complete tts story: {}".format(title))
 
 def spanish_correction(text):
     PAUSE_CORRECTIONS = [
@@ -233,7 +228,6 @@ def spanish_correction(text):
         [" pero ", ", pero "],
         [" *** ", ""],
     ]
-
     for val in PAUSE_CORRECTIONS:
         text = text.replace(val[0], val[1])
     return text
@@ -261,11 +255,8 @@ if __name__ == "__main__":
         story = FileStory(args.story_dir)
     elif args.wattpad:
         story = WattpadStory(args.story_dir)
-        story.save_text_story()
     elif args.chapter:
         story = WattapadChapter(args.story_dir)
     else:
         print("What kind of story is it? Use --help")
 
-    if "story" in locals():
-        story.create_TTS()
