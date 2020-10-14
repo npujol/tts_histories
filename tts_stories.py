@@ -156,43 +156,45 @@ class WattpadStory:
 
 
 class WattapadChapter:
-    def __init__(self, url):
+    def __init__(self, url, language="es", filename=None):
         self.url = url
         self.title = ""
-        self.content = ""
+        self.text = ""
+        self.language = language
+        self.filename = filename
         self.extract_info()
+        self.make()
+
+    def make(self):
+        if not self.filename and not os.path.isfile(f"{self.title}.txt"):
+            self.filename = save_text(self.title, " ".join([self.title, self.text]))
+        else:
+            print(f"{self.title} has been saved")
+        if self.filename and not os.path.isfile(f"{self.title}.mp3"):
+            FileStory(self.filename, self.language)
+        else:
+            print(f"{self.title} already has an audio")
 
     def extract_info(self):
         chapter_html = get_content(self.url)
-        title = (
-            str(chapter_html.title.string)
-            .encode("ascii", "ignore")
-            .decode("utf-8")
-            .partition("-")[0]
-            .strip()
-        )
+        title = str(chapter_html.title.string)       
         self.title = RE_CLEAN.sub(" ", title)
-        self.content = self.chapter_content(chapter_html).replace(" y ", ", y ")
+        self.text = self.get_chapter_text(chapter_html)
 
-    def create_TTS(self):
-        tts = gTTS(spanish_correction(self.title + " " + self.content), lang="es")
-        tts.save(f"{self.title}.mp3")
-        print("Chapter tts story")
-
-    def chapter_content(self, chapter_html):
-        content = ""
+    def get_chapter_text(self, chapter_html):
+        text = ""
         i = 1
         while i == 1 or (str(i) in chapter_html.title.string):
-            article_texts = chapter_html.findAll(attrs={"data-p-id": True})
-            chapter = "\n".join(
+            chapter_parts = chapter_html.findAll(attrs={"data-p-id": True})
+            part = "\n".join(
                 html.unescape(t.text).replace("\u2022" * 3, "").strip()
-                for t in article_texts
+                for t in chapter_parts
             )
-            content += chapter
+            text += part
             i += 1
-            page = self.url + f"/page/{i}"
-            chapter_html = get_content(page)
-            return content
+            new_page_url = self.url + f"/page/{i}"
+            chapter_html = get_content(new_page_url)
+        return text
 
 
 class FileStory:
@@ -216,10 +218,17 @@ def read_content(filename):
     return content
 
 def create_TTS(title, text, language):
-    print("Init tts story: {}".format(title))
+    print(f"Init tts story: {title}")
     tts = gTTS(text, lang=language)
-    tts.save("{}.mp3".format(title))
-    print("Complete tts story: {}".format(title))
+    tts.save("{title}.mp3")
+    print(f"Complete tts story: {title}")
+
+def save_text(title, text):
+        with open(f"{title}.txt", "w", encoding="utf8") as outfile:
+            print(f"Init save story: {title}")
+            outfile.write(text)
+            print(f"Complete save story: {title}")
+        return f"{title}.txt"
 
 def spanish_correction(text):
     PAUSE_CORRECTIONS = [
