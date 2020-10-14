@@ -7,14 +7,14 @@ def read(file_name):
 
 
 setup(
-    name="tts_histories",
+    name="tts_stories",
     version="0.1",
-    description="Create TSS from txt or wattpad histories",
-    url="https://github.com/npujol/tts_histories",
+    description="Create TSS from txt or Wattpad stories",
+    url="https://github.com/npujol/tts_stories",
     author="Naivy Pujol Méndez",
     author_email="naivy.luna@gmail.com",
     license="MIT",
-    py_modules=["tts_histories"],
+    py_modules=["tts_stories"],
     long_description=read("README.md"),
     zip_safe=False,
 )
