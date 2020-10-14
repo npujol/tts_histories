@@ -71,6 +71,7 @@ LANGUAGE = [
     "cy",
 ]
 URL_BASE_WATTPAD = "https://www.wattpad.com"
+WATTPAD_BASE_DIR = os.getcwd()
 
 Chapter = recordtype(
     "Chapter", field_names=["title", "url", "saved_text", "saved_audio"]
@@ -93,8 +94,11 @@ class WattpadStory:
     def get_info(self):
         html_story = get_content(self.url)
 
-        title = str(html_story.title.string)
+        title = str(html_story.title.string).split("-")[0]
         self.title = RE_CLEAN.sub(" ", title)
+
+        if not os.path.exists(os.path.join(WATTPAD_BASE_DIR, self.title)):
+            os.mkdir(os.path.join(WATTPAD_BASE_DIR, self.title))
 
         author = html_story.find("a", attrs={"class": "send-author-event on-navigate"})
         self.author = "".join(e.string for e in author)
@@ -102,8 +106,10 @@ class WattpadStory:
         summary = html_story.find("pre")
         self.summary = "".join(e.string for e in summary)
 
-        if not os.path.isfile(f"{self.title} Index.txt") or not os.path.isfile(
-            f"{self.title} Summary.txt"
+        if not os.path.isfile(
+            os.path.join(WATTPAD_BASE_DIR, self.title, f"{self.title} Index.txt")
+        ) or not os.path.isfile(
+            os.path.join(WATTPAD_BASE_DIR, self.title, f"{self.title} Summary.txt")
         ):
             self.get_chapters(html_story)
         else:
@@ -118,22 +124,27 @@ class WattpadStory:
             )
             self.chapters.append(
                 Chapter(
-                    RE_SPACES.sub(" ", RE_CLEAN.sub(" ", ch.a.text)),
+                    ch.a.text.strip(),
                     url_chapter,
                     "",
                     "",
                 )
             )
         save_text(
-            f"{self.title} Summary", "\n".join([self.title, self.author, self.summary])
+            f"{self.title} Summary",
+            "\n".join([self.title, self.author, self.summary]),
+            os.path.join(WATTPAD_BASE_DIR, self.title),
         )
         save_text(
             f"{self.title} Index",
             "\n".join([",".join([val for val in ch]) for ch in self.chapters]),
+            os.path.join(WATTPAD_BASE_DIR, self.title),
         )
 
     def load_chapters(self):
-        content_chapters = read_content(f"{self.title} Index.txt")
+        content_chapters = read_content(
+            os.path.join(WATTPAD_BASE_DIR, self.title, f"{self.title} Index.txt")
+        )
         for line in content_chapters.split("\n"):
             title, url, saved_text, saved_audio = line.split(",")
             self.chapters.append(Chapter(title, url, saved_text, saved_audio))
@@ -144,24 +155,35 @@ class WattpadStory:
                 WattapadChapter(
                     chapter.url,
                     self.language,
+                    self.title,
                     chapter.title,
                 )
-                chapter.saved_text = f"{chapter.title}.txt"
+                chapter.saved_text = os.path.join(
+                    WATTPAD_BASE_DIR, self.title, f"{chapter.title}.txt"
+                )
                 if chapter.saved_audio == "":
                     WattapadChapter(
-                        chapter.url, self.language, chapter.title, chapter.saved_text
+                        chapter.url,
+                        self.language,
+                        self.title,
+                        chapter.title,
+                        chapter.saved_text,
                     )
-                    chapter.saved_audio = f"{chapter.title}.mp3"
+                    chapter.saved_audio = os.path.join(
+                        WATTPAD_BASE_DIR, self.title, f"{chapter.title}.mp3"
+                    )
 
         save_text(
             f"{self.title} Index",
             "\n".join([",".join([val for val in ch]) for ch in self.chapters]),
+            os.path.join(WATTPAD_BASE_DIR, self.title),
         )
 
 
 class WattapadChapter:
-    def __init__(self, url, language="es", title="", filename=None):
+    def __init__(self, url, language="es", story="", title="", filename=None):
         self.url = url
+        self.story = story
         self.title = title
         self.text = ""
         self.language = language
@@ -170,11 +192,19 @@ class WattapadChapter:
         self.make()
 
     def make(self):
-        if not self.filename and not os.path.isfile(f"{self.title}.txt"):
-            self.filename = save_text(self.title, "\n".join([self.title, self.text]))
+        if not self.filename and not os.path.isfile(
+            os.path.join(WATTPAD_BASE_DIR, self.title, f"{self.title}.txt")
+        ):
+            self.filename = save_text(
+                self.title,
+                "\n".join([self.title, self.text]),
+                os.path.join(WATTPAD_BASE_DIR, self.story),
+            )
         else:
             print(f"{self.title} has been saved")
-        if self.filename and not os.path.isfile(f"{self.title}.mp3"):
+        if self.filename and not os.path.isfile(
+            os.path.join(WATTPAD_BASE_DIR, self.story, f"{self.title}.mp3")
+        ):
             FileStory(self.filename, self.language)
         else:
             print(f"{self.title} already has an audio")
@@ -183,7 +213,7 @@ class WattapadChapter:
         chapter_html = get_content(self.url)
         if self.title == "":
             title = str(chapter_html.title.string)
-            self.title = RE_CLEAN.sub(" ", title)
+            self.title = title.strip()
         self.text = self.get_chapter_text(chapter_html)
 
     def get_chapter_text(self, chapter_html):
@@ -205,10 +235,16 @@ class WattapadChapter:
 class FileStory:
     def __init__(self, filename, language="es"):
         self.filename = filename
-        self.title = filename.split(".")[0]
+        self.title = filename.split("/")[-1].split(".")[0]
         self.language = language
         self.text = read_content(self.filename)
-        create_TTS(self.title, self.text, self.language)
+
+        self.make()
+
+    def make(self):
+        print(f"Init tts story: {self.title}")
+        create_TTS(self.filename.split(".")[0], self.text, self.language)
+        print(f"Complete tts story: {self.title}")
 
 
 def get_content(url):
@@ -225,19 +261,17 @@ def read_content(filename):
     return content
 
 
-def create_TTS(title, text, language):
-    print(f"Init tts story: {title}")
+def create_TTS(filename, text, language):
     tts = gTTS(text, lang=language)
-    tts.save(f"{title}.mp3")
-    print(f"Complete tts story: {title}")
+    tts.save(f"{filename}.mp3")
 
 
-def save_text(title, text):
-    with open(f"{title}.txt", "w", encoding="utf8") as outfile:
+def save_text(title, text, path):
+    with open(os.path.join(path, f"{title}.txt"), "w", encoding="utf8") as outfile:
         print(f"Init save story: {title}")
         outfile.write(text)
         print(f"Complete save story: {title}")
-    return f"{title}.txt"
+    return os.path.join(path, f"{title}.txt")
 
 
 def spanish_correction(text):
