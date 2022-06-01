@@ -1,9 +1,11 @@
 import logging
 from pathlib import Path
+from app import file
 from app.models import Language
 from app.file import FileStory
 from click.core import Context, Option
 from typing import Optional
+from app.tts_stories import combine_audio
 
 import click
 
@@ -53,6 +55,25 @@ def run(language, wattpad, file) -> None:
     if file:
         story = FileStory(file, language)
         story.run()
+
+
+@cli.command()
+@click.option(
+    "--filename",
+    default="UNKNOWN",
+    type=str,
+    prompt="Filename",
+    help="Filename for the output, default value is UNKNOWN",
+)
+@click.option(
+    "--path",
+    type=Path,
+    prompt="Folder's path",
+    help="Path for the output with the *.mp3 files",
+)
+def merge(filename, path) -> None:
+    """Merge *.mp3 files from a path"""
+    combine_audio(path, filename)
 
 
 if __name__ == "__main__":

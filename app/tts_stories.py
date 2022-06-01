@@ -2,6 +2,11 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from gtts import gTTS
+from pydub import AudioSegment
+import glob
+import logging
+
+logger = logging.getLogger(__file__)
 
 
 def get_content(url: str) -> BeautifulSoup:
@@ -41,3 +46,14 @@ def spanish_correction(text):
     for val in PAUSE_CORRECTIONS:
         text = text.replace(val[0], val[1])
     return text
+
+
+def combine_audio(path: Path, filename: str):
+    logger.info(f"Merge audio from folder {path}")
+    combined = AudioSegment.empty()
+    files = [f for f in glob.glob("*.mp3", root_dir=path)]
+    logger.info(f"Available audios {len(files)}")
+    for song in sorted(files, key=lambda f: int(f.split("_")[1].split(".")[0])):
+        logger.info(f"Merging file {song}")
+        combined += AudioSegment.from_file(path / song, "mp3")
+    combined.export(f"{filename}.mp3", format="mp3")
