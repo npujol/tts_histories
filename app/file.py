@@ -6,14 +6,16 @@ import os
 from urllib.request import Request, urlopen
 import uuid
 from bs4 import BeautifulSoup
+from urllib3 import Retry
 from gtts import gTTS
-from app.tts_stories import read_text, get_content, create_TTS
+from app.tts_stories import read_text, combine_audio, create_TTS
 from app.models import Language, Story, Sentence, Paragraph
 from nltk.tokenize import sent_tokenize
 from pathlib import Path
 from pydub import AudioSegment
 
 SIZE = 10
+RETRY_ATTEMPTS = 10
 URL_BASE_WATTPAD = "https://www.wattpad.com"
 WATTPAD_BASE_DIR = os.getcwd()
 RE_CLEAN = re.compile(r"\/")
@@ -39,23 +41,19 @@ class FileStory:
         self.story.content = [Paragraph(sentences=sentences[s:s+SIZE]) for s in range(0, len(sentences), SIZE)]
 
     def create_audio(self):
-        parent_path = self.story.saved_text_path.parent
-        logger.info(parent_path)
+        parent_path = self.story.saved_text_path.parent / "temp"
         for x, p in enumerate(self.story.content):
             for k, s in enumerate(p.sentences):
-                temp_path = parent_path / "temp"
+                temp_path = parent_path / f"{x}"
                 temp_path.mkdir(exist_ok=True)
                 part = temp_path / str(k)
-                create_TTS(part, s.content, self.story.language)
-                self.combine_audio(temp_path, f"paragraph_{x}")
-                shutil.rmtree(temp_path)
+                retry_attempts = RETRY_ATTEMPTS
+                while retry_attempts:
+                    try:
+                        create_TTS(part, s.content, self.story.language)
+                    except Exception as e:
+                        logger.exception(f"Retrying {retry_attempts}, TTS failed due to {e}", exc_info=True)
+                        retry_attempts -= 1
+                combine_audio(temp_path, f"{x}")
 
-        self.combine_audio(parent_path, f"{self.story.title}{self.story.id}")
-
-    @staticmethod
-    def combine_audio(path: Path, filename: str):
-        combined = AudioSegment.empty()
-        for song in sorted(mp3_file for mp3_file in glob.glob("*.mp3", root_dir=path)):
-            combined += AudioSegment.from_file(path / song, "mp3")
-            os.remove(path / song)
-        combined.export(f"{filename}.mp3", format="mp3")
+        combine_audio(parent_path, f"{self.story.title}-{self.story.id}")
