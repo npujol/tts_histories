@@ -3,6 +3,7 @@ import shutil
 import glob
 import re
 import os
+import time
 from urllib.request import Request, urlopen
 import uuid
 from bs4 import BeautifulSoup
@@ -42,6 +43,7 @@ class FileStory:
 
     def create_audio(self):
         parent_path = self.story.saved_text_path.parent / "temp"
+        parent_path.mkdir(exist_ok=True)
         for x, p in enumerate(self.story.content):
             for k, s in enumerate(p.sentences):
                 temp_path = parent_path / f"{x}"
@@ -50,6 +52,7 @@ class FileStory:
                 retry_attempts = RETRY_ATTEMPTS
                 while retry_attempts:
                     try:
+                        time.sleep(15)
                         create_TTS(part, s.content, self.story.language)
                     except Exception as e:
                         logger.exception(f"Retrying {retry_attempts}, TTS failed due to {e}", exc_info=True)
