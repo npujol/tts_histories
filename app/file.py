@@ -42,21 +42,24 @@ class FileStory:
         self.story.content = [Paragraph(sentences=sentences[s:s+SIZE]) for s in range(0, len(sentences), SIZE)]
 
     def create_audio(self):
-        parent_path = self.story.saved_text_path.parent / "temp"
+        logger.info("Starting to make audios")
+        parent_path = self.story.saved_text_path.parent.absolute() / "temp"
         parent_path.mkdir(exist_ok=True)
         for x, p in enumerate(self.story.content):
+            temp_path = parent_path / f"{x}"
+            temp_path.mkdir(exist_ok=True)
             for k, s in enumerate(p.sentences):
-                temp_path = parent_path / f"{x}"
-                temp_path.mkdir(exist_ok=True)
-                part = temp_path / str(k)
+                part = temp_path / f"sentence_{k}"
                 retry_attempts = RETRY_ATTEMPTS
                 while retry_attempts:
                     try:
-                        time.sleep(15)
+                        time.sleep(10)
                         create_TTS(part, s.content, self.story.language)
+                        break
                     except Exception as e:
                         logger.exception(f"Retrying {retry_attempts}, TTS failed due to {e}", exc_info=True)
                         retry_attempts -= 1
-                combine_audio(temp_path, f"{x}")
+            combine_audio(temp_path, f"paragraph_{x}")
+            shutil.rmtree(temp_path)
 
         combine_audio(parent_path, f"{self.story.title}-{self.story.id}")
