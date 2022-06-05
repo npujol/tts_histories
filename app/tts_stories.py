@@ -5,6 +5,7 @@ from gtts import gTTS
 from pydub import AudioSegment
 import glob
 import logging
+import os
 
 logger = logging.getLogger(__file__)
 
@@ -60,3 +61,6 @@ def combine_audio(path: Path, filename: str):
         except Exception as e:
             logger.exception(f"Failed merging file {song}, due to {e}", exc_info=True)
     combined.export(f"{filename}.mp3", format="mp3")
+
+    for song in files:
+        os.remove(path / song)
