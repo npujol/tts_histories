@@ -15,7 +15,7 @@ from nltk.tokenize import sent_tokenize
 from pathlib import Path
 from pydub import AudioSegment
 
-SIZE = 10
+SIZE = 15
 RETRY_ATTEMPTS = 10
 URL_BASE_WATTPAD = "https://www.wattpad.com"
 WATTPAD_BASE_DIR = os.getcwd()
@@ -53,7 +53,7 @@ class FileStory:
                 retry_attempts = RETRY_ATTEMPTS
                 while retry_attempts:
                     try:
-                        time.sleep(10)
+                        time.sleep(3)
                         create_TTS(part, s.content, self.story.language)
                         break
                     except Exception as e:
@@ -62,4 +62,4 @@ class FileStory:
             combine_audio(temp_path, f"paragraph_{x}")
             shutil.rmtree(temp_path)
 
-        combine_audio(parent_path, f"{self.story.title}-{self.story.id}")
+        combine_audio(parent_path.parent, f"{self.story.title}-{self.story.id}")
