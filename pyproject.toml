@@ -1,0 +1,26 @@
+[tool.black]
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # The following are specific to Black, you probably don't want those.
+  | tests/fixtures
+)/
+'''
+
+[tool.flake8]
+
+exclude = ["README.md"]
+format = "colored"
+max_line_length = 127
+
+[tool.pytest.ini_options]
+
+addopts = "--mypy"
+
+[tool.mypy]
+
+mypy_path = "${MYPY_CONFIG_FILE_DIR}/"
+no_site_packages = "True"
+no_silence_site_packages = "True"
+ignore_missing_imports = "True"
