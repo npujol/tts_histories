@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from app import file
 from app.models import Language
 from app.file import FileStory
 from click.core import Context, Option
@@ -9,12 +8,18 @@ from app.tts_stories import combine_audio
 
 import click
 
-
-CURRENT_PATH = Path(__file__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+from app.wattpad import Wattpad
 
 
-def prompt_file(ctx: Context, param: Option, is_file: bool) -> Optional[list[str]]:
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+
+
+def prompt_file(
+    ctx: Context, param: Option, is_file: bool
+) -> Optional[list[str]]:
     if is_file:
         value = ctx.params.get("path")
         if not value:
@@ -22,7 +27,9 @@ def prompt_file(ctx: Context, param: Option, is_file: bool) -> Optional[list[str
         return value
 
 
-def prompt_wattpad(ctx: Context, param: Option, is_wattpad: bool) -> Optional[list[str]]:
+def prompt_wattpad(
+    ctx: Context, param: Option, is_wattpad: bool
+) -> Optional[list[str]]:
     if is_wattpad:
         value = ctx.params.get("url")
         if not value:
@@ -48,13 +55,26 @@ def cli():
         GERMAN = "de-DE"
     """,
 )
-@click.option("--file/--no-file", is_flag=True, default=False, callback=prompt_file)
-@click.option("--wattpad/--no-wattpad", is_flag=True, default=False, callback=prompt_wattpad)
+@click.option(
+    "--file/--no-file", is_flag=True, default=False, callback=prompt_file
+)
+@click.option(
+    "--wattpad/--no-wattpad",
+    is_flag=True,
+    default=False,
+    callback=prompt_wattpad,
+)
 def run(language, wattpad, file) -> None:
-    """ Runs the tts for the given story"""
+    """Runs the tts for the given story"""
     if file:
         story = FileStory(file, language)
         story.run()
+
+    if wattpad:
+        story = Wattpad(url=wattpad, language=language)
+        filename = story.save()
+        file_story = FileStory(filename, story.story.language)
+        file_story.run()
 
 
 @cli.command()

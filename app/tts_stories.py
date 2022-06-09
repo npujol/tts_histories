@@ -37,29 +37,21 @@ def save_text(title: str, text: str, path: Path):
     return path.joinpath(f"{title}.txt")
 
 
-def spanish_correction(text):
-    PAUSE_CORRECTIONS = [
-        [" y ", ", y "],
-        [" o ", ", o "],
-        [" pero ", ", pero "],
-        [" *** ", ""],
-    ]
-    for val in PAUSE_CORRECTIONS:
-        text = text.replace(val[0], val[1])
-    return text
-
-
 def combine_audio(path: Path, filename: str):
     logger.info(f"Merge audio from folder {path}")
     combined = AudioSegment.empty()
     files = [f for f in glob.glob("*.mp3", root_dir=path)]
     logger.info(f"Available audios {len(files)}")
-    for song in sorted(files, key=lambda f: int(f.split("_")[1].split(".")[0])):
+    for song in sorted(
+        files, key=lambda f: int(f.split("_")[1].split(".")[0])
+    ):
         logger.info(f"Merging file {song}")
         try:
             combined += AudioSegment.from_file(path / song, "mp3")
         except Exception as e:
-            logger.exception(f"Failed merging file {song}, due to {e}", exc_info=True)
+            logger.exception(
+                f"Failed merging file {song}, due to {e}", exc_info=True
+            )
     combined.export(f"{filename}.mp3", format="mp3")
 
     for song in files:
