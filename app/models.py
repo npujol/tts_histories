@@ -1,9 +1,8 @@
-
+import uuid
 from enum import Enum
-from lib2to3.pgen2.token import OP
 from pathlib import Path
 from typing import Optional
-import uuid
+
 from pydantic import BaseModel
 
 
@@ -33,3 +32,19 @@ class Story(BaseModel):
     saved_text_path: Path
     language: Language = Language.SPANISH
     content: list[Paragraph] = []
+
+
+class Chapter(BaseModel):
+    id: uuid.UUID
+    url: str
+    text: str = ""
+    text_path: Optional[Path] = None
+
+
+class WattpadStory(BaseModel):
+    id: uuid.UUID
+    url: str
+    title: str = "None"
+    text_path: Path
+    language: Language = Language.SPANISH
+    chapters: list[Chapter] = []
