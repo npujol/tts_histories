@@ -41,18 +41,15 @@ def combine_audio(path: Path, filename: str):
     logger.info(f"Merge audio from folder {path}")
     combined = AudioSegment.empty()
     files = [f for f in glob.glob("*.mp3", root_dir=path)]
-    logger.info(f"Available audios {len(files)}")
-    for song in sorted(
-        files, key=lambda f: int(f.split("_")[1].split(".")[0])
-    ):
-        logger.info(f"Merging file {song}")
+    for a in sorted(files, key=lambda f: int(f.split("_")[1].split(".")[0])):
         try:
-            combined += AudioSegment.from_file(path / song, "mp3")
+            combined += AudioSegment.from_file(path / a, "mp3")
         except Exception as e:
             logger.exception(
-                f"Failed merging file {song}, due to {e}", exc_info=True
+                f"Failed merging file {a}, due to {e}", exc_info=True
             )
-    combined.export(f"{filename}.mp3", format="mp3")
+    logger.info(f"Saving {filename}")
+    combined.export(path / f"{filename}.mp3", format="mp3")
 
-    for song in files:
-        os.remove(path / song)
+    for a in files:
+        os.remove(path / a)

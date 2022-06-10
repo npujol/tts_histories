@@ -9,7 +9,7 @@ from nltk.tokenize import sent_tokenize
 from app.models import Language, Paragraph, Sentence, Story
 from app.tts_stories import combine_audio, create_TTS, read_text
 
-SIZE = 20
+SIZE = 30
 RETRY_ATTEMPTS = 10
 logger = logging.getLogger(__file__)
 
@@ -28,12 +28,16 @@ class FileStory:
             id=uuid.uuid1(), language=language, saved_text_path=path
         )
         self.story.title = str(path).split(".")[0]
+        logger.info(
+            f"Creating story({self.story.title} in {self.story.language} "
+            f"from {self.story.saved_text_path})"
+        )
 
     def run(self):
         self.extract_content()
-        logger.info(f"Init tts story: {self.story.id}")
+        logger.info("Creating audio")
         self.create_audio()
-        logger.info(f"Complete tts story: {self.story.id}")
+        logger.info("Audio completed")
 
     def extract_content(self):
         # Convert the text into paragraphs
@@ -47,7 +51,6 @@ class FileStory:
         ]
 
     def create_audio(self):
-        logger.info("Starting to make audios")
         parent_path = self.story.saved_text_path.parent.absolute() / "temp"
         parent_path.mkdir(exist_ok=True)
         for x, p in enumerate(self.story.content):
@@ -55,6 +58,7 @@ class FileStory:
             temp_path.mkdir(exist_ok=True)
             for k, s in enumerate(p.sentences):
                 part = temp_path / f"sentence_{k}"
+                logger.info(f"Saving audio to {part}")
                 retry_attempts = RETRY_ATTEMPTS
                 while retry_attempts:
                     try:
@@ -70,6 +74,4 @@ class FileStory:
             combine_audio(temp_path, f"paragraph_{x}")
             shutil.rmtree(temp_path)
 
-        combine_audio(
-            parent_path.parent, f"{self.story.title}-{self.story.id}"
-        )
+        combine_audio(parent_path, f"{self.story.title}-{self.story.id}")
