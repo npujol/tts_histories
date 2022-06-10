@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from tkinter import CURRENT
 from app.models import Language
 from app.file import FileStory
 from click.core import Context, Option
@@ -15,6 +16,8 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
+
+CURRENT_PATH = Path(__file__).parent
 
 
 def prompt_file(
@@ -56,7 +59,10 @@ def cli():
     """,
 )
 @click.option(
-    "--file/--no-file", is_flag=True, default=False, callback=prompt_file
+    "--file/--no-file",
+    is_flag=True,
+    default=False,
+    callback=prompt_file,
 )
 @click.option(
     "--wattpad/--no-wattpad",
@@ -67,7 +73,8 @@ def cli():
 def run(language, wattpad, file) -> None:
     """Runs the tts for the given story"""
     if file:
-        story = FileStory(file, language)
+        file_path = CURRENT_PATH.joinpath(file)
+        story = FileStory(file_path, language)
         story.run()
 
     if wattpad:
