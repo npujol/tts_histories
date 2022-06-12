@@ -1,11 +1,11 @@
 import html
+import logging
 import os
 import re
 import uuid
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from soupsieve import select
 
 from app.models import Chapter, Language, WattpadStory
 from app.tts_stories import get_content
@@ -16,6 +16,8 @@ URL_BASE_WATTPAD = "https://www.wattpad.com"
 WATTPAD_BASE_DIR = os.getcwd()
 RE_CLEAN = re.compile(r"\/")
 RE_SPACES = re.compile(r"\s+")
+
+logger = logging.getLogger(__file__)
 
 
 class Wattpad:
@@ -30,6 +32,7 @@ class Wattpad:
     def __init__(self, url: str, language: Language = Language.SPANISH):
         id = uuid.uuid1()
         filename = CURRENT_TEMP_PATH.joinpath(f"{id}.txt")
+        logger.info(f"Creating file {filename}")
         # Create the file
         open(filename, mode="w").close()
         self.story = WattpadStory(
@@ -37,6 +40,7 @@ class Wattpad:
         )
 
     def save(self) -> Path:
+        logger.info(f"Starting the content download from {self.story.url}")
         html_story = get_content(self.story.url)
         self.story.title = (
             html_story.find(
@@ -60,15 +64,24 @@ class Wattpad:
             ).string  # type: ignore
             or ""
         )
+        logger.info(f"Saving story info {self.story.title}, {author}")
 
         self.write(
             self.story.text_path,
             f"{self.story.title}, {author} \n {summary} \n",
         )
 
-        for ch in html_story.find_all(
+        chapters = html_story.find(
+            "div", attrs={"class": "story-parts"}
+        ).find_all(  # type: ignore
             "a", attrs={"class": "story-parts__part"}
-        ):
+        )
+
+        logger.info(f"There are {len(chapters)}")
+
+        for k, ch in enumerate(chapters):
+            logger.info(f"Proccessing chapter {k}")
+
             url_chapter = (
                 URL_BASE_WATTPAD
                 + html.unescape(ch.get("href"))
@@ -101,6 +114,8 @@ class Wattpad:
         text = ""
         i = 1
         while i == 1 or (str(i) in chapter_html.title.string):  # type: ignore
+            logger.info(f"Processing page {i}")
+
             chapter_parts = chapter_html.findAll(attrs={"data-p-id": True})
             part = "\n".join(
                 html.unescape(t.text).replace("\u2022" * 3, "").strip()
@@ -113,10 +128,12 @@ class Wattpad:
         return text
 
     def write(self, file_path: Path, content: str):
+        logger.info(f"Writing to file {file_path} {len(content)} characters")
         with open(file_path, "a") as f:
             f.write(content)
 
     def rename(self, path: Path, new_name: str):
-        new_path = Path(path.parent, f"{new_name}.{path.suffix}")
+        new_path = Path(path.parent, f"{new_name}{path.suffix}")
+        logger.info(f"Renaming file {path} -> {new_path}")
         path.rename(new_path)
         self.story.text_path = new_path

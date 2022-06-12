@@ -48,8 +48,8 @@ def combine_audio(path: Path, filename: str):
             logger.exception(
                 f"Failed merging file {a}, due to {e}", exc_info=True
             )
-    logger.info(f"Saving {filename}")
-    combined.export(path / f"{filename}.mp3", format="mp3")
+    logger.info(f"Saving {f'{filename}.mp3'}")
+    combined.export(path.parent / f"{filename}.mp3", format="mp3")
 
     for a in files:
         os.remove(path / a)
