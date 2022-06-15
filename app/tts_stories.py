@@ -46,7 +46,8 @@ def combine_audio(path: Path, filename: str):
             combined += AudioSegment.from_file(path / a, "mp3")
         except Exception as e:
             logger.exception(
-                f"Failed merging file {a}, due to {e}", exc_info=True
+                f"Failed merging file {a}, due to {e}",
+                exc_info=True,
             )
     logger.info(f"Saving {f'{filename}.mp3'}")
     combined.export(path.parent / f"{filename}.mp3", format="mp3")

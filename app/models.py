@@ -48,3 +48,12 @@ class WattpadStory(BaseModel):
     text_path: Path
     language: Language = Language.SPANISH
     chapters: list[Chapter] = []
+
+
+class AO3Story(BaseModel):
+    id: uuid.UUID
+    url: str
+    title: str = "None"
+    text_path: Path
+    language: Language = Language.SPANISH
+    chapters: list[Chapter] = []
