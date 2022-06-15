@@ -51,7 +51,7 @@ class Wattpad:
             ).string  # type: ignore
             or ""
         )
-        self.story.title = str(title.encode("utf8"))
+        self.story.title = title.encode("ascii", "ignore").decode("utf-8")
         if self.story.title:
             self.rename(
                 self.story.text_path, f"{self.story.title}-{self.story.id}"
