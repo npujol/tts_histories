@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from tkinter import CURRENT
 from app.models import Language
 from app.file import FileStory
 from click.core import Context, Option
@@ -10,6 +9,7 @@ from app.tts_stories import combine_audio
 import click
 
 from app.wattpad import Wattpad
+from app.ao3 import AO3
 
 
 logging.basicConfig(
@@ -21,7 +21,9 @@ CURRENT_PATH = Path(__file__).parent
 
 
 def prompt_file(
-    ctx: Context, param: Option, is_file: bool
+    ctx: Context,
+    param: Option,
+    is_file: bool,
 ) -> Optional[list[str]]:
     if is_file:
         value = ctx.params.get("path")
@@ -37,6 +39,16 @@ def prompt_wattpad(
         value = ctx.params.get("url")
         if not value:
             value = click.prompt("Wattpad story's url")
+        return value
+
+
+def prompt_ao3(
+    ctx: Context, param: Option, is_ao3: bool
+) -> Optional[list[str]]:
+    if is_ao3:
+        value = ctx.params.get("url")
+        if not value:
+            value = click.prompt("AO3 story's url")
         return value
 
 
@@ -70,7 +82,13 @@ def cli():
     default=False,
     callback=prompt_wattpad,
 )
-def run(language, wattpad, file) -> None:
+@click.option(
+    "--ao3/--no-ao3",
+    is_flag=True,
+    default=False,
+    callback=prompt_ao3,
+)
+def run(language, wattpad, file, ao3) -> None:
     """Runs the tts for the given story"""
     if file:
         file_path = CURRENT_PATH.joinpath(file)
@@ -79,6 +97,12 @@ def run(language, wattpad, file) -> None:
 
     if wattpad:
         story = Wattpad(url=wattpad, language=language)
+        filename = story.save()
+        file_story = FileStory(filename, story.story.language)
+        file_story.run()
+
+    if ao3:
+        story = AO3(url=ao3, language=language)
         filename = story.save()
         file_story = FileStory(filename, story.story.language)
         file_story.run()

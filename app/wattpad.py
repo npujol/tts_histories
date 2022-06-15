@@ -36,18 +36,22 @@ class Wattpad:
         # Create the file
         open(filename, mode="w").close()
         self.story = WattpadStory(
-            id=id, url=url, language=language, text_path=filename
+            id=id,
+            url=url,
+            language=language,
+            text_path=filename,
         )
 
     def save(self) -> Path:
         logger.info(f"Starting the content download from {self.story.url}")
         html_story = get_content(self.story.url)
-        self.story.title = (
+        title = (
             html_story.find(
                 "div", attrs={"class": "story-info__title"}
             ).string  # type: ignore
             or ""
         )
+        self.story.title = str(title.encode("utf8"))
         if self.story.title:
             self.rename(
                 self.story.text_path, f"{self.story.title}-{self.story.id}"
@@ -100,7 +104,10 @@ class Wattpad:
     def extract_info(self, url: str) -> str:
         chapter_html = get_content(url)
         title = (
-            chapter_html.find("h1", attrs={"class": "h2"}).string  # type: ignore
+            chapter_html.find(
+                "h1",
+                attrs={"class": "h2"},
+            ).string  # type: ignore
             or ""
         )
         text = self.get_chapter_text(url, chapter_html)
