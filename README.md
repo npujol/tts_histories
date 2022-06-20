@@ -1,4 +1,7 @@
 # tts_histories
 
-Create TSS from a text or stories from the Wattpad (default language: Spanish)
-Do that proyect in Go, or at least an example using go
+Create TSS from a text or stories from the Wattpad, AO3 or file (default language: Spanish)
+
+
+# Command to read one line from clipboard ctrl-m
+sh -c "xclip -o | gtts-cli -l es - | mpv -"
