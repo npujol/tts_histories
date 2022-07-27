@@ -88,7 +88,7 @@ def cli():
     default=False,
     callback=prompt_ao3,
 )
-def run(language, wattpad, file, ao3) -> None:
+def run(language: Language, wattpad: str, file: str, ao3: str) -> None:
     """Runs the tts for the given story"""
     if file:
         file_path = CURRENT_PATH.joinpath(file)
@@ -122,7 +122,7 @@ def run(language, wattpad, file, ao3) -> None:
     prompt="Folder's path",
     help="Path for the output with the *.mp3 files",
 )
-def merge(filename, path) -> None:
+def merge(filename: str, path: Path) -> None:
     """Merge *.mp3 files from a path"""
     combine_audio(path, filename)
 

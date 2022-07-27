@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 
-def read(file_name):
+def read(file_name: str):
     return open(os.path.join(os.path.dirname(__file__), file_name)).read()
 
 

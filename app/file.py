@@ -4,7 +4,7 @@ import time
 import uuid
 from pathlib import Path
 
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize  # type: ignore
 
 from app.models import Language, Paragraph, Sentence, Story
 from app.tts_stories import combine_audio, create_TTS, read_text
@@ -42,11 +42,13 @@ class FileStory:
     def extract_content(self):
         # Convert the text into paragraphs
         sentences = list(
-            Sentence(content=s)
-            for s in sent_tokenize(read_text(self.story.saved_text_path))
+            Sentence(content=s)  # type: ignore
+            for s in sent_tokenize(  # type: ignore
+                read_text(self.story.saved_text_path)
+            )
         )
         self.story.content = [
-            Paragraph(sentences=sentences[s : s + SIZE])
+            Paragraph(sentences=sentences[s : s + SIZE])  # noqa
             for s in range(0, len(sentences), SIZE)
         ]
 

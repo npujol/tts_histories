@@ -1,8 +1,8 @@
 from pathlib import Path
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
-from gtts import gTTS
-from pydub import AudioSegment
+from gtts import gTTS  # type: ignore
+from pydub import AudioSegment  # type: ignore
 import glob
 import logging
 import os
@@ -24,16 +24,16 @@ def read_text(filename: Path) -> str:
     return content
 
 
-def create_TTS(filename, text, language):
-    tts = gTTS(text, lang=language)
-    tts.save(f"{filename}.mp3")
+def create_TTS(filename: Path, text: str, language: str) -> None:
+    tts = gTTS(text, lang=language)  # type: ignore
+    tts.save(f"{filename}.mp3")  # type: ignore
 
 
 def save_text(title: str, text: str, path: Path):
     with open(path.joinpath(f"{title}.txt"), "w", encoding="utf8") as outfile:
-        print(f"Init save story: {title}")
+        logger.info(f"Init save story: {title}")
         outfile.write(text)
-        print(f"Complete save story: {title}")
+        logger.info(f"Complete save story: {title}")
     return path.joinpath(f"{title}.txt")
 
 
@@ -43,14 +43,14 @@ def combine_audio(path: Path, filename: str):
     files = [f for f in glob.glob("*.mp3", root_dir=path)]
     for a in sorted(files, key=lambda f: int(f.split("_")[1].split(".")[0])):
         try:
-            combined += AudioSegment.from_file(path / a, "mp3")
+            combined += AudioSegment.from_file(path / a, "mp3")  # type: ignore
         except Exception as e:
             logger.exception(
                 f"Failed merging file {a}, due to {e}",
                 exc_info=True,
             )
     logger.info(f"Saving {f'{filename}.mp3'}")
-    combined.export(path.parent / f"{filename}.mp3", format="mp3")
+    combined.export(path.parent / f"{filename}.mp3", format="mp3")  # type: ignore
 
     for a in files:
         os.remove(path / a)
