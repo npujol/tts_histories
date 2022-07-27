@@ -39,35 +39,23 @@ class AO3:
 
     def save(self) -> Path:
         logger.info(f"Starting the download from {self.story.url}")
-        html_story = get_content(self.story.url)
-        for li in html_story.find(
-            "li", attrs={"class": "download"}
-        ).find_all(  # type: ignore
-            "li"
-        ):
-            if li.a.string != "HTML":
-                continue
-            url = (
-                URL_BASE
-                + html.unescape(li.a.get("href"))
-                .replace("\u2022" * 3, "")
-                .strip()
-            )
-            content = get_content(url)
-            self.story.title = content.title.string or ""  # type: ignore
-            if self.story.title:
-                self.rename(
-                    self.story.text_path, f"{self.story.title}-{self.story.id}"
-                )
+        content = get_content(self.story.url)
 
-            text = "\n".join(
-                html.unescape(t.text).replace("\u2022" * 3, "").strip()
-                for t in content.findAll("p")
-            )
-            self.write(
+        self.story.title = content.title.string or ""  # type: ignore
+        if self.story.title:
+            self.rename(
                 self.story.text_path,
-                text,
+                f"{self.story.title}-{self.story.id}",
             )
+
+        text = "\n".join(
+            html.unescape(t.text).replace("\u2022" * 3, "").strip()
+            for t in content.findAll("p")
+        )
+        self.write(
+            self.story.text_path,
+            text,
+        )
         return self.story.text_path
 
     def write(self, file_path: Path, content: str):

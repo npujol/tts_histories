@@ -1,6 +1,5 @@
 import html
 import logging
-import os
 import re
 import uuid
 from pathlib import Path
@@ -13,9 +12,7 @@ from app.tts_stories import get_content
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")
 
 URL_BASE_WATTPAD = "https://www.wattpad.com"
-WATTPAD_BASE_DIR = os.getcwd()
 RE_CLEAN = re.compile(r"\/")
-RE_SPACES = re.compile(r"\s+")
 
 logger = logging.getLogger(__file__)
 
@@ -45,24 +42,28 @@ class Wattpad:
     def save(self) -> Path:
         logger.info(f"Starting the content download from {self.story.url}")
         html_story = get_content(self.story.url)
-        title = (
-            html_story.find(
-                "div", attrs={"class": "story-info__title"}
-            ).string  # type: ignore
-            or ""
+        title = (  # type: ignore
+            (
+                html_story.find(
+                    "div", attrs={"class": "story-info__title"}
+                ).string  # type: ignore
+                or ""
+            )
+            .encode("ascii", "ignore")  # type: ignore
+            .decode("utf-8")
         )
-        self.story.title = title.encode("ascii", "ignore").decode("utf-8")
+        self.story.title = RE_CLEAN.sub("", title)  # type: ignore
         if self.story.title:
             self.rename(
                 self.story.text_path, f"{self.story.title}-{self.story.id}"
             )
-        author = (
+        author = (  # type: ignore
             html_story.find(
                 "div", attrs={"class": "author-info__username"}
             ).string  # type: ignore
             or ""
         )
-        summary = (
+        summary = (  # type: ignore
             html_story.find(
                 "pre", attrs={"class": "description-text"}
             ).string  # type: ignore
@@ -75,15 +76,15 @@ class Wattpad:
             f"{self.story.title}, {author} \n {summary} \n",
         )
 
-        chapters = html_story.find(
+        chapters = html_story.find(  # type: ignore
             "div", attrs={"class": "story-parts"}
         ).find_all(  # type: ignore
             "a", attrs={"class": "story-parts__part"}
         )
 
-        logger.info(f"There are {len(chapters)}")
+        logger.info(f"There are {len(chapters)}")  # type: ignore
 
-        for k, ch in enumerate(chapters):
+        for k, ch in enumerate(chapters):  # type: ignore
             logger.info(f"Proccessing chapter {k}")
 
             url_chapter = (
@@ -103,7 +104,7 @@ class Wattpad:
 
     def extract_info(self, url: str) -> str:
         chapter_html = get_content(url)
-        title = (
+        title = (  # type: ignore
             chapter_html.find(
                 "h1",
                 attrs={"class": "h2"},
