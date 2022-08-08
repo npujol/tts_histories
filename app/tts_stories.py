@@ -40,7 +40,13 @@ def read_text(filename: Path) -> str:
 
 
 def create_TTS(filename: Path, text: str, language: str) -> None:
-    tts = gTTS(text, lang=language)  # type: ignore
+    attempts = 5
+    while attempts:
+        try:
+            tts = gTTS(text, lang=language)  # type: ignore
+            break
+        except Exception:
+            attempts = attempts - 1
     tts.save(f"{filename}.mp3")  # type: ignore
 
 
