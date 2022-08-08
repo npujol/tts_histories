@@ -1,19 +1,34 @@
-from pathlib import Path
-from urllib.request import Request, urlopen
-from bs4 import BeautifulSoup
-from gtts import gTTS  # type: ignore
-from pydub import AudioSegment  # type: ignore
 import glob
 import logging
 import os
+from pathlib import Path
+
+import requests
+from bs4 import BeautifulSoup
+from gtts import gTTS  # type: ignore
+from pydub import AudioSegment  # type: ignore
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logger = logging.getLogger(__file__)
+
+retry_strategy = Retry(
+    total=5,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["HEAD", "GET", "PUT", "DELETE", "OPTIONS", "TRACE"],
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http_requests = requests.Session()
+http_requests.mount("https://", adapter)
+http_requests.mount("http://", adapter)
 
 
 def get_content(url: str) -> BeautifulSoup:
     MOZILLA = {"User-Agent": "Mozilla/5.0"}
-    req = Request(url, headers=MOZILLA)
-    html_content = urlopen(req).read()
+    response = http_requests.get(url, headers=MOZILLA)
+    response.raise_for_status()
+
+    html_content = response.content
     return BeautifulSoup(html_content, "html.parser")
 
 
