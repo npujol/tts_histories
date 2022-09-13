@@ -60,7 +60,7 @@ class FileStory:
             temp_path.mkdir(exist_ok=True)
             for k, s in enumerate(p.sentences):
                 part = temp_path / f"sentence_{k}"
-                logger.info(f"Saving audio to {part}")
+                logger.debug(f"Saving audio to {part}")
                 retry_attempts = RETRY_ATTEMPTS
                 while retry_attempts:
                     try:
