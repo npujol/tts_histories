@@ -5,6 +5,7 @@ from app.file import FileStory
 from click.core import Context, Option
 from typing import Optional
 from app.tts_stories import combine_audio
+from app.telegram_handler import send_to_telegram
 
 import click
 
@@ -125,6 +126,18 @@ def run(language: Language, wattpad: str, file: str, ao3: str) -> None:
 def merge(filename: str, path: Path) -> None:
     """Merge *.mp3 files from a path"""
     combine_audio(path, filename)
+
+
+@cli.command()
+@click.option(
+    "--path",
+    type=Path,
+    default="/home/npujol/Desktop/shop_list.csv",
+    prompt="Folder's path",
+    help="Path for the output with the *.mp3 files",
+)
+def send(path: Path) -> None:
+    send_to_telegram(path, "temp")
 
 
 if __name__ == "__main__":

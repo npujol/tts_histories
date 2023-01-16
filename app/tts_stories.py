@@ -58,7 +58,7 @@ def save_text(title: str, text: str, path: Path):
     return path.joinpath(f"{title}.txt")
 
 
-def combine_audio(path: Path, filename: str):
+def combine_audio(path: Path, filename: str) -> Path:
     logger.debug(f"Merge audio from folder {path}")
     combined = AudioSegment.empty()
     files = [f for f in glob.glob("*.mp3", root_dir=path)]
@@ -71,7 +71,10 @@ def combine_audio(path: Path, filename: str):
                 exc_info=True,
             )
     logger.debug(f"Saving {f'{filename}.mp3'}")
+    filepath = path.parent / f"{filename}.mp3"
     combined.export(path.parent / f"{filename}.mp3", format="mp3")  # type: ignore
 
     for a in files:
         os.remove(path / a)
+
+    return filepath

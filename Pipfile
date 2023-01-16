@@ -8,6 +8,8 @@ bs4 = "*"
 pydantic = "*"
 nltk = "*"
 pydub = "*"
+peewee = "*"
+telegram-upload = "*"
 
 [dev-packages]
 black = "*"
