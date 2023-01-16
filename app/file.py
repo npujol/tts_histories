@@ -7,6 +7,7 @@ from pathlib import Path
 from nltk.tokenize import sent_tokenize  # type: ignore
 
 from app.models import Language, Paragraph, Sentence, Story
+from app.telegram_handler import send_to_telegram
 from app.tts_stories import combine_audio, create_TTS, read_text
 
 SIZE = 30
@@ -36,8 +37,15 @@ class FileStory:
     def run(self):
         self.extract_content()
         logger.info("Creating audio")
-        self.create_audio()
+        file_path = self.create_audio()
         logger.info("Audio completed")
+
+        logger.info("Sending to telegram")
+        send_to_telegram(self.story.saved_text_path, self.story.title)
+        send_to_telegram(file_path, self.story.title)
+        logger.info("Finished sending to telegram")
+        self.story.saved_text_path.unlink()
+        file_path.unlink()
 
     def extract_content(self):
         # Convert the text into paragraphs
@@ -52,7 +60,7 @@ class FileStory:
             for s in range(0, len(sentences), SIZE)
         ]
 
-    def create_audio(self):
+    def create_audio(self) -> Path:
         parent_path = self.story.saved_text_path.parent.absolute() / "temp"
         parent_path.mkdir(exist_ok=True)
         for x, p in enumerate(self.story.content):
@@ -76,4 +84,6 @@ class FileStory:
             combine_audio(temp_path, f"paragraph_{x}")
             shutil.rmtree(temp_path)
 
-        combine_audio(parent_path, f"{self.story.title}-{self.story.id}")
+        return combine_audio(
+            parent_path, f"{self.story.title}-{self.story.id}"
+        )
