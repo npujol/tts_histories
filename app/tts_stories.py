@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from gtts import gTTS  # type: ignore
 from pydub import AudioSegment  # type: ignore
 from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+from urllib3.util.retry import Retry  # type: ignore
 
 logger = logging.getLogger(__file__)
 
@@ -17,7 +17,7 @@ retry_strategy: Retry = Retry(
     status_forcelist=[429, 500, 502, 503, 504],
     allowed_methods=["HEAD", "GET", "PUT", "DELETE", "OPTIONS", "TRACE"],
 )
-adapter = HTTPAdapter(max_retries=retry_strategy)
+adapter = HTTPAdapter(max_retries=retry_strategy)  # type: ignore
 http_requests = requests.Session()
 http_requests.mount("https://", adapter)
 http_requests.mount("http://", adapter)

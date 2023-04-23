@@ -6,7 +6,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from app.models import Chapter, Language, WattpadStory
+from app.serializers import Chapter, Language, WattpadStory
 from app.tts_stories import get_content
 
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")
@@ -85,7 +85,7 @@ class Wattpad:
         logger.info(f"There are {len(chapters)}")  # type: ignore
 
         for k, ch in enumerate(chapters):  # type: ignore
-            logger.info(f"Proccessing chapter {k}")
+            logger.info(f"Processing chapter {k}")
 
             url_chapter = (
                 URL_BASE_WATTPAD
