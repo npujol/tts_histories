@@ -12,6 +12,11 @@ peewee = "*"
 telegram-upload = "*"
 requests = "*"
 gtts = "*"
+wheel = "*"
+setuptools = "*"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
 
 [dev-packages]
 black = "*"
@@ -19,3 +24,6 @@ flake8 = "*"
 
 [requires]
 python_version = "3.10"
+
+[pipenv]
+allow_prereleases = true

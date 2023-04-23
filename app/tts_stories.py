@@ -12,7 +12,7 @@ from urllib3.util.retry import Retry
 
 logger = logging.getLogger(__file__)
 
-retry_strategy = Retry(
+retry_strategy: Retry = Retry(
     total=5,
     status_forcelist=[429, 500, 502, 503, 504],
     allowed_methods=["HEAD", "GET", "PUT", "DELETE", "OPTIONS", "TRACE"],
@@ -72,7 +72,10 @@ def combine_audio(path: Path, filename: str) -> Path:
             )
     logger.debug(f"Saving {f'{filename}.mp3'}")
     filepath = path.parent / f"{filename}.mp3"
-    combined.export(path.parent / f"{filename}.mp3", format="mp3")  # type: ignore
+    combined.export(  # type: ignore
+        path.parent / f"{filename}.mp3",
+        format="mp3",
+    )
 
     for a in files:
         os.remove(path / a)

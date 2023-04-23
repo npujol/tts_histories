@@ -132,7 +132,6 @@ def merge(filename: str, path: Path) -> None:
 @click.option(
     "--path",
     type=Path,
-    default="/home/npujol/Desktop/shop_list.csv",
     prompt="Folder's path",
     help="Path for the output with the *.mp3 files",
 )
