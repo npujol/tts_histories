@@ -1,8 +1,8 @@
 import logging
+from json import loads
 from pathlib import Path
 
 from telethon.sync import TelegramClient
-from json import loads
 
 logger = logging.getLogger(__file__)
 
