@@ -5,7 +5,7 @@ import re
 import uuid
 from pathlib import Path
 
-from app.models import AO3Story, Language
+from app.serializers import AO3Story, Language
 from app.tts_stories import get_content
 
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")

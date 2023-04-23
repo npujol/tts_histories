@@ -6,7 +6,7 @@ from pathlib import Path
 
 from nltk.tokenize import sent_tokenize  # type: ignore
 
-from app.models import Language, Paragraph, Sentence, Story
+from app.serializers import Language, Paragraph, Sentence, Story
 from app.telegram_handler import send_to_telegram
 from app.tts_stories import combine_audio, create_TTS, read_text
 
