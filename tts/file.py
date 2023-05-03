@@ -6,9 +6,9 @@ from pathlib import Path
 
 from nltk.tokenize import sent_tokenize  # type: ignore
 
-from app.serializers import Language, Paragraph, Sentence, Story
-from app.telegram_handler import send_to_telegram
-from app.tts_stories import combine_audio, create_TTS, read_text
+from tts.serializers import Language, Paragraph, Sentence, Story
+from tts.telegram_handler import send_to_telegram
+from tts.tts_stories import merge_audio, create_TTS, read_text
 
 SIZE = 30
 RETRY_ATTEMPTS = 10
@@ -81,9 +81,7 @@ class FileStory:
                             exc_info=True,
                         )
                         retry_attempts -= 1
-            combine_audio(temp_path, f"paragraph_{x}")
+            merge_audio(f"paragraph_{x}", temp_path)
             shutil.rmtree(temp_path)
 
-        return combine_audio(
-            parent_path, f"{self.story.title}-{self.story.id}"
-        )
+        return merge_audio(f"{self.story.title}-{self.story.id}", parent_path)

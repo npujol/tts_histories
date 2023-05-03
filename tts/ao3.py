@@ -5,8 +5,8 @@ import re
 import uuid
 from pathlib import Path
 
-from app.serializers import AO3Story, Language
-from app.tts_stories import get_content
+from tts.serializers import AO3Story, Language
+from tts.tts_stories import get_content
 
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")
 
@@ -50,7 +50,7 @@ class AO3:
 
         text = "\n".join(
             html.unescape(t.text).replace("\u2022" * 3, "").strip()
-            for t in content.findAll("p")
+            for t in content.findAll("p")  # type: ignore
         )
         self.write(
             self.story.text_path,
