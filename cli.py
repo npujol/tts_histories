@@ -1,16 +1,15 @@
 import logging
 from pathlib import Path
-from app.serializers import Language
-from app.file import FileStory
+from tts.serializers import Language
+from tts.file import FileStory
 from click.core import Context, Option
 from typing import Optional
-from app.tts_stories import combine_audio
-from app.telegram_handler import send_to_telegram
+from tts.telegram_handler import send_to_telegram
 
 import click
 
-from app.wattpad import Wattpad
-from app.ao3 import AO3
+from tts.wattpad import Wattpad
+from tts.ao3 import AO3
 
 
 logging.basicConfig(
@@ -125,7 +124,7 @@ def run(language: Language, wattpad: str, file: str, ao3: str) -> None:
 )
 def merge(filename: str, path: Path) -> None:
     """Merge *.mp3 files from a path"""
-    combine_audio(path, filename)
+    # type: ignore(path, filename)
 
 
 @cli.command()

@@ -17,10 +17,13 @@ setuptools = "*"
 torch = "*"
 torchvision = "*"
 torchaudio = "*"
+ruff = "*"
 
 [dev-packages]
 black = "*"
 flake8 = "*"
+ruff = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.10"

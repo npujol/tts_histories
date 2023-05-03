@@ -103,7 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 .direnv
-.vscode
 .envrc
 *.mp3
 *.txt

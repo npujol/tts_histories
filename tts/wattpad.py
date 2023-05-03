@@ -1,13 +1,13 @@
 import html
 import logging
 import re
+from typing import Optional
 import uuid
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-
-from app.serializers import Chapter, Language, WattpadStory
-from app.tts_stories import get_content
+from tts.serializers import Chapter, Language, WattpadStory
+from tts.tts_stories import get_content
 
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")
 
@@ -44,7 +44,7 @@ class Wattpad:
         html_story = get_content(self.story.url)
         title = (  # type: ignore
             (
-                html_story.find(
+                html_story.find(  # type: ignore
                     "div", attrs={"class": "story-info__title"}
                 ).string  # type: ignore
                 or ""
@@ -54,24 +54,24 @@ class Wattpad:
         )
         self.story.title = RE_CLEAN.sub("", title)  # type: ignore
         if self.story.title:
-            self.rename(
+            self._rename(
                 self.story.text_path, f"{self.story.title}-{self.story.id}"
             )
         author = (  # type: ignore
-            html_story.find(
+            html_story.find(  # type: ignore
                 "div", attrs={"class": "author-info__username"}
             ).string  # type: ignore
             or ""
         )
         summary = (  # type: ignore
-            html_story.find(
+            html_story.find(  # type: ignore
                 "pre", attrs={"class": "description-text"}
             ).string  # type: ignore
             or ""
         )
         logger.info(f"Saving story info {self.story.title}, {author}")
 
-        self.write(
+        self._write(
             self.story.text_path,
             f"{self.story.title}, {author} \n {summary} \n",
         )
@@ -97,28 +97,29 @@ class Wattpad:
                 Chapter(
                     id=uuid.uuid1(),
                     url=url_chapter,
-                    text=self.extract_info(url_chapter),
+                    text=self._extract_info(url_chapter),
                 )
             )
         return self.story.text_path
 
-    def extract_info(self, url: str) -> str:
+    def _extract_info(self, url: str) -> Optional[str]:
         chapter_html = get_content(url)
         title = (  # type: ignore
-            chapter_html.find(
+            chapter_html.find(  # type: ignore
                 "h1",
                 attrs={"class": "h2"},
             ).string  # type: ignore
             or ""
         )
-        text = self.get_chapter_text(url, chapter_html)
-        self.write(
-            self.story.text_path,
-            f"\n {title}\n {text}",
-        )
-        return f"\n {title}\n {text}"
+        if chapter_html:
+            text = self._get_chapter_text(url, chapter_html)
+            self._write(
+                self.story.text_path,
+                f"\n {title}\n {text}",
+            )
+            return f"\n {title}\n {text}"
 
-    def get_chapter_text(self, url: str, chapter_html: BeautifulSoup) -> str:
+    def _get_chapter_text(self, url: str, chapter_html: BeautifulSoup) -> str:
         text = ""
         i = 1
         while i == 1 or (str(i) in chapter_html.title.string):  # type: ignore
@@ -132,15 +133,15 @@ class Wattpad:
             text += part
             i += 1
             new_page_url = url + f"/page/{i}"
-            chapter_html = get_content(new_page_url)
+            chapter_html = get_content(new_page_url)  # type: ignore
         return text
 
-    def write(self, file_path: Path, content: str):
+    def _write(self, file_path: Path, content: str):
         logger.info(f"Writing to file {file_path} {len(content)} characters")
         with open(file_path, "a") as f:
             f.write(content)
 
-    def rename(self, path: Path, new_name: str):
+    def _rename(self, path: Path, new_name: str):
         new_path = Path(path.parent, f"{new_name}{path.suffix}")
         logger.info(f"Renaming file {path} -> {new_path}")
         path.rename(new_path)
