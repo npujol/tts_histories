@@ -1,11 +1,11 @@
 import os
 import tempfile
 from pathlib import Path
-from tts.tts_stories import save_text, get_content
-
+from tts.tts_stories import save_text, get_content, read_text, create_TTS
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
+import pytest
 
 
 # Test save_text function
@@ -87,6 +87,67 @@ def test_get_content_request_exception():
     result = get_content(url)
     expected = None
     assert result == expected
+
+
+def test_read_text():
+    # Create a temporary file with some text
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as f:
+        f.write("hello\nworld\n")
+
+    # Call the read_text function to read the temporary file
+    filename = Path(f.name)
+    content = read_text(filename)
+
+    # Check that the function returned the expected content
+    assert content == "hello\nworld"
+
+    # Clean up the temporary file
+    filename.unlink()
+
+
+def test_read_text_file_not_found():
+    assert read_text(Path("non_existing_file.txt")) is None
+
+
+def test_read_text_permission_error():
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        os.chmod(temp_file.name, 0o000)
+        assert read_text(Path(temp_file.name)) is None
+
+
+def test_read_text_unicode_error():
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as temp_file:
+        temp_file.write("Some non-UTF-8 encoded text: \x80")
+        assert read_text(Path(temp_file.name)) == ""
+
+
+def test_read_text_io_error():
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as temp_file:
+        temp_file.write("Some text")
+        os.chmod(temp_file.name, 0o000)
+        assert read_text(Path(temp_file.name)) is None
+
+
+def test_read_text_empty_file():
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as temp_file:
+        temp_file_path = Path(temp_file.name)
+        assert read_text(temp_file_path) == ""
+
+
+@pytest.fixture
+def tts_file():
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+        yield Path(f.name)
+    # Clean up the temporary file
+
+
+def test_create_TTS(tts_file: Path):
+    # Test that TTS file is created successfully
+    text = "Hello, world!"
+    language = "en"
+    create_TTS(tts_file, text, language)
+    assert os.path.exists(tts_file)
 
 
 # Helper function to raise an exception
