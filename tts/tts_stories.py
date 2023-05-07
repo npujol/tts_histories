@@ -12,6 +12,8 @@ from requests.adapters import HTTPAdapter
 from requests.sessions import Session
 from urllib3.util.retry import Retry  # type: ignore
 
+from tts.serializers import TTSType  # type: ignore
+
 logger = logging.getLogger(__file__)
 
 retry_strategy = Retry(
@@ -97,7 +99,9 @@ def read_text(filename: Path) -> Optional[str]:
         return None
 
 
-def create_TTS(filename: Path, text: str, language: str) -> None:
+def create_TTS(
+    type: TTSType, filename: Path, text: str, language: str
+) -> None:
     """
     Create a Text-to-Speech (TTS) audio file from the given text in
     the specified language and save it to a file.
@@ -117,16 +121,15 @@ def create_TTS(filename: Path, text: str, language: str) -> None:
     attempts = 5
     while attempts:
         try:
-            tts = gTTS(text, lang=language)  # type: ignore
+            if type == TTSType.GOOGlE:
+                tts = gTTS(text, lang=language)  # type: ignore
+                tts.save(f"{filename}.mp3")  # type: ignore
+            elif type == TTSType.C0QUI:
+                tts = create_coqui_tts(text, language)
             break
         except Exception as e:
             logger.warning(f"Error creating TTS audio: {e}")
             attempts -= 1
-
-    try:
-        tts.save(f"{filename}.mp3")  # type: ignore
-    except Exception as e:
-        logger.error(f"Error saving TTS audio: {e}")
 
 
 def save_text(title: str, text: str, path: Path) -> Path:
@@ -187,3 +190,7 @@ def merge_audio_files(filename: str, path: Path) -> Path:
     _ = [os.remove(path / file) for file in files]
 
     return filepath
+
+
+def create_coqui_tts(text: str, language: str):
+    pass

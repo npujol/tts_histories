@@ -16,6 +16,15 @@ class Language(str, Enum):
         return list(map(lambda c: c.value, cls))
 
 
+class TTSType(str, Enum):
+    GOOGlE = "google"
+    C0QUI = "coqui"
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
+
 class Sentence(BaseModel):
     content: str
     audio_path: str = ""

@@ -27,7 +27,7 @@ def test_file_story_send_to_telegram(
     file_story.tokenize()
     assert snapshot() == file_story.story.language
     assert snapshot() == "|".join(
-        sorted(p.model_dump_json() for p in file_story.story.content)
+        sorted(p.json() for p in file_story.story.content)
     )
 
     filename = file_story.create_audio()

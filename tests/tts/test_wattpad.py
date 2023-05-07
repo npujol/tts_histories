@@ -13,7 +13,7 @@ def test_init(
     assert wattpad.story.language == Language.ENGLISH
     assert isinstance(wattpad.story.text_path, Path)
     assert snapshot() == "|".join(
-        sorted(p.model_dump_json() for p in wattpad.story.chapters)
+        sorted(p.json() for p in wattpad.story.chapters)
     )
 
 

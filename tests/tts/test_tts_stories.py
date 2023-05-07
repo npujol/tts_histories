@@ -1,6 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
+from tts.serializers import TTSType
 from tts.tts_stories import save_text, get_content, read_text, create_TTS
 import requests
 from bs4 import BeautifulSoup
@@ -146,7 +147,7 @@ def test_create_TTS(tts_file: Path):
     # Test that TTS file is created successfully
     text = "Hello, world!"
     language = "en"
-    create_TTS(tts_file, text, language)
+    create_TTS(TTSType.GOOGlE, tts_file, text, language)
     assert os.path.exists(tts_file)
 
 
