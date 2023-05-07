@@ -98,8 +98,9 @@ def run(language: Language, wattpad: str, file: str, ao3: str) -> None:
     if wattpad:
         story = Wattpad(url=wattpad, language=language)
         filename = story.save()
-        file_story = FileStory(filename, story.story.language)
-        file_story.run()
+        if filename is not None:
+            file_story = FileStory(filename, story.story.language)
+            file_story.run()
 
     if ao3:
         story = AO3(url=ao3, language=language)

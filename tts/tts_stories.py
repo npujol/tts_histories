@@ -152,7 +152,7 @@ def save_text(title: str, text: str, path: Path) -> Path:
     return path.joinpath(f"{title}.txt")
 
 
-def merge_audio(filename: str, path: Path) -> Path:
+def merge_audio_files(filename: str, path: Path) -> Path:
     """
     Merge multiple audio files from the specified path into a single
     audio file.

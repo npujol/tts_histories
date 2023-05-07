@@ -8,7 +8,7 @@ from nltk.tokenize import sent_tokenize  # type: ignore
 
 from tts.serializers import Language, Paragraph, Sentence, Story
 from tts.telegram_handler import send_to_telegram
-from tts.tts_stories import merge_audio, create_TTS, read_text
+from tts.tts_stories import merge_audio_files, create_TTS, read_text
 
 SIZE = 30
 RETRY_ATTEMPTS = 10
@@ -35,7 +35,7 @@ class FileStory:
         )
 
     def run(self):
-        self.extract_content()
+        self.tokenize()
         logger.info("Creating audio")
         file_path = self.create_audio()
         logger.info("Audio completed")
@@ -47,7 +47,7 @@ class FileStory:
         self.story.saved_text_path.unlink()
         file_path.unlink()
 
-    def extract_content(self):
+    def tokenize(self):
         # Convert the text into paragraphs
         sentences = list(
             Sentence(content=s)  # type: ignore
@@ -61,27 +61,40 @@ class FileStory:
         ]
 
     def create_audio(self) -> Path:
-        parent_path = self.story.saved_text_path.parent.absolute() / "temp"
+        parent_path = (self.story.saved_text_path.parent / "temp").absolute()
         parent_path.mkdir(exist_ok=True)
-        for x, p in enumerate(self.story.content):
-            temp_path = parent_path / f"{x}"
-            temp_path.mkdir(exist_ok=True)
-            for k, s in enumerate(p.sentences):
-                part = temp_path / f"sentence_{k}"
-                logger.debug(f"Saving audio to {part}")
-                retry_attempts = RETRY_ATTEMPTS
-                while retry_attempts:
+
+        for paragraph_idx, paragraph in enumerate(self.story.content):
+            paragraph_path = parent_path / f"paragraph_{paragraph_idx}"
+            paragraph_path.mkdir(exist_ok=True)
+
+            for sentence_idx, sentence in enumerate(paragraph.sentences):
+                sentence_path = paragraph_path / f"sentence_{sentence_idx}"
+                logger.debug(f"Saving audio to {sentence_path}")
+
+                for _ in range(RETRY_ATTEMPTS):
                     try:
                         time.sleep(3)
-                        create_TTS(part, s.content, self.story.language)
+                        create_TTS(
+                            sentence_path,
+                            sentence.content,
+                            self.story.language,
+                        )
                         break
                     except Exception as e:
                         logger.exception(
-                            f"Retrying {retry_attempts} TTS failed due to {e}",
-                            exc_info=True,
+                            f"TTS failed due to {e}", exc_info=True
                         )
-                        retry_attempts -= 1
-            merge_audio(f"paragraph_{x}", temp_path)
-            shutil.rmtree(temp_path)
+                else:
+                    logger.error(
+                        f"Failed to create audio for sentence {sentence_idx} in "
+                        f"paragraph {paragraph_idx}"
+                    )
+                    continue
 
-        return merge_audio(f"{self.story.title}-{self.story.id}", parent_path)
+            merge_audio_files(f"paragraph_{paragraph_idx}", paragraph_path)
+            shutil.rmtree(paragraph_path)
+
+        return merge_audio_files(
+            f"{self.story.title}-{self.story.id}", parent_path
+        )

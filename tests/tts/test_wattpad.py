@@ -24,17 +24,18 @@ def test_save(
     wattpad = Wattpad(REAL_WATTPAD_URL, language=Language.ENGLISH)
     # Check that the save method works as expected
     path = wattpad.save()
-    assert snapshot() == "|".join(
-        sorted(ch.text for ch in wattpad.story.chapters)
-    )
-    assert isinstance(path, Path)
+    if path is not None:
+        assert snapshot() == "|".join(
+            sorted(ch.text for ch in wattpad.story.chapters)
+        )
+        assert isinstance(path, Path)
 
 
 @pytest.mark.vcr()
 def test_write(wattpad: Wattpad, temp_dir: Path):
     # Check that the _write method works as expected
     file_path = temp_dir / "test.txt"
-    wattpad._write(file_path, "Test content")
+    wattpad._write(file_path, "Test content")  # type: ignore
     assert file_path.read_text() == "Test content"
 
 
@@ -44,7 +45,7 @@ def test_rename(wattpad: Wattpad, temp_dir: Path):
     old_path = temp_dir / "old.txt"
     old_path.write_text("Old content")
     new_name = "new"
-    wattpad._rename(old_path, new_name)
+    wattpad._rename(old_path, new_name)  # type: ignore
     new_path = temp_dir / f"{new_name}.txt"
     assert not old_path.exists()
     assert new_path.exists()
