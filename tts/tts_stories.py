@@ -1,18 +1,16 @@
-import glob
 import logging
-import os
 from pathlib import Path
 from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
 from gtts import gTTS  # type: ignore
-from pydub import AudioSegment  # type: ignore
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session
 from urllib3.util.retry import Retry  # type: ignore
-
-from tts.serializers import TTSType  # type: ignore
+from TTS.api import TTS  # type: ignore
+import ffmpeg  # type: ignore
+from tts.serializers import Language, TTSType  # type: ignore
 
 logger = logging.getLogger(__file__)
 
@@ -100,7 +98,7 @@ def read_text(filename: Path) -> Optional[str]:
 
 
 def create_TTS(
-    type: TTSType, filename: Path, text: str, language: str
+    type: TTSType, filename: Path, text: str, language: Language
 ) -> None:
     """
     Create a Text-to-Speech (TTS) audio file from the given text in
@@ -125,7 +123,7 @@ def create_TTS(
                 tts = gTTS(text, lang=language)  # type: ignore
                 tts.save(f"{filename}.mp3")  # type: ignore
             elif type == TTSType.C0QUI:
-                tts = create_coqui_tts(text, language)
+                tts = create_coqui_tts(filename, text, language)
             break
         except Exception as e:
             logger.warning(f"Error creating TTS audio: {e}")
@@ -168,29 +166,41 @@ def merge_audio_files(filename: str, path: Path) -> Path:
         Path: The path of the merged audio file.
     """
     logger.debug(f"Merge audio from folder {path}")
-    combined = AudioSegment.empty()
-    files = [f for f in glob.glob("*.mp3", root_dir=path)]
-    for file in sorted(
-        files, key=lambda f: int(f.split("_")[1].split(".")[0])
-    ):
-        try:
-            combined += AudioSegment.from_file(  # type: ignore
-                path / file,
-                "mp3",
-            )
-        except Exception as e:
-            logger.exception(
-                f"Failed merging file {file}, due to {e}",
-                exc_info=True,
-            )
     filepath = path.parent / f"{filename}.mp3"
-    combined.export(filepath, format="mp3")  # type: ignore
+
+    files = [path / f for f in sorted(path.glob("*.mp3"))]
+    inputs = [ffmpeg.input(str(f)) for f in files]  # type: ignore
+    ffmpeg.concat(*inputs, a=1, v=0).output(str(filepath)).run(  # type: ignore
+        overwrite_output=True
+    )
+
     logger.debug(f"Saved {filepath}")
 
-    _ = [os.remove(path / file) for file in files]
+    for f in files:
+        f.unlink()
 
     return filepath
 
 
-def create_coqui_tts(text: str, language: str):
-    pass
+MAP_LANGUAGE_MODEL = {Language.SPANISH: "tts_models/es/css10/vits"}
+
+
+def create_coqui_tts(filename: Path, text: str, language: Language):
+    model = MAP_LANGUAGE_MODEL.get(language, None)
+    if model is None:
+        list_models: list[str] = [
+            m for m in TTS.list_models() if f"/{language}/" in m  # type: ignore
+        ]
+        if not list_models:
+            return
+        model = list_models[0]
+    tts = TTS(
+        model_name=model,
+        progress_bar=False,
+        gpu=False,
+    )
+    tts.tts_to_file(
+        text,
+        file_path=f"{filename}.mp3",
+    )
+    return f"{filename}.mp3"

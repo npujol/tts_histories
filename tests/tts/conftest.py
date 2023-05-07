@@ -34,3 +34,16 @@ def wattpad():
     # Create a new Wattpad object for testing
     wp = Wattpad(REAL_WATTPAD_URL, language=Language.ENGLISH)
     return wp
+
+
+@pytest.fixture
+def tts_file():
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+        yield Path(f.name)
+    # Clean up the temporary file
+
+
+# Helper function to raise an exception
+def raise_exception(exception: Exception):
+    raise exception
