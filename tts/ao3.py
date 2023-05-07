@@ -58,6 +58,8 @@ class AO3:
         )
         return self.story.text_path
 
+
+    # TODO take this out of this class
     def write(self, file_path: Path, content: str):
         logger.info(f"Writing to file {file_path} {len(content)} characters")
         with open(file_path, "a") as f:

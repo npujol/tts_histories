@@ -52,11 +52,13 @@ def prompt_ao3(
             value = click.prompt("AO3 story's url")
         return value
 
+# TODO Check https://typer.tiangolo.com/
 
 @click.group()
 def cli():
     pass
 
+# TODO  Autogenerate help choices
 
 @cli.command()
 @click.option(
@@ -71,6 +73,10 @@ def cli():
         GERMAN = "de-DE"
     """,
 )
+
+
+# TODO  Autogenerate help choices
+
 @click.option(
     "--tts_type",
     type=click.Choice(TTSType.list()),

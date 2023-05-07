@@ -93,8 +93,7 @@ class Wattpad:
             url_chapter = (
                 URL_BASE_WATTPAD
                 + html.unescape(ch.get("href"))
-                .replace("\u2022" * 3, "")
-                .strip()
+                .replace("\u2022" * 3, "") .strip()
             )
             self.story.chapters.append(
                 Chapter(
