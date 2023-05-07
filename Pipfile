@@ -18,6 +18,10 @@ torch = "*"
 torchvision = "*"
 torchaudio = "*"
 ruff = "*"
+pytest-insta = "*"
+pytest-vcr = "*"
+urllib3 = "==1.26.15"
+pytest-cov = "*"
 
 [dev-packages]
 black = "*"
