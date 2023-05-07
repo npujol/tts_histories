@@ -112,3 +112,41 @@ target-version = "py310"
 [tool.ruff.mccabe]
 # Unlike Flake8, default to a complexity level of 10.
 max-complexity = 10
+
+[tool.poetry]
+name = "tts-stories"
+version = "0.1.0"
+description = ""
+authors = ["npujol <naivy.luna@gmail.com>"]
+readme = "README.md"
+packages = [{include = "tts_stories"}]
+
+[tool.poetry.dependencies]
+python = "3.10.x"
+bs4 = "*"
+pydantic = "*"
+nltk = "*"
+pydub = "*"
+peewee = "*"
+telegram-upload = "*"
+requests = "*"
+gtts = "*"
+wheel = "*"
+setuptools = "*"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
+ruff = "*"
+pytest-insta = "*"
+pytest-vcr = "*"
+urllib3 = "==1.26.15"
+pytest-cov = "*"
+black = "*"
+flake8 = "*"
+pytest = "*"
+tts = "^0.13.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

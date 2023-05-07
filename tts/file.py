@@ -6,7 +6,7 @@ from pathlib import Path
 
 from nltk.tokenize import sent_tokenize  # type: ignore
 
-from tts.serializers import Language, Paragraph, Sentence, Story
+from tts.serializers import Language, Paragraph, Sentence, Story, TTSType
 from tts.telegram_handler import send_to_telegram
 from tts.tts_stories import merge_audio_files, create_TTS, read_text
 
@@ -76,6 +76,7 @@ class FileStory:
                     try:
                         time.sleep(3)
                         create_TTS(
+                            TTSType.GOOGlE,
                             sentence_path,
                             sentence.content,
                             self.story.language,
