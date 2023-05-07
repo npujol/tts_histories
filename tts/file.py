@@ -1,5 +1,4 @@
 import logging
-import shutil
 import time
 import uuid
 from pathlib import Path
@@ -24,11 +23,17 @@ class FileStory:
         story: Story
     """
 
-    def __init__(self, path: Path, language: Language = Language.SPANISH):
+    def __init__(
+        self,
+        path: Path,
+        language: Language = Language.SPANISH,
+        tts_type: TTSType = TTSType.GOOGlE,
+    ):
         self.story = Story(
             id=uuid.uuid1(), language=language, saved_text_path=path
         )
         self.story.title = str(path).split(".")[0]
+        self.tts_type = tts_type
         logger.info(
             f"Creating story({self.story.title} in {self.story.language} "
             f"from {self.story.saved_text_path})"
@@ -76,7 +81,7 @@ class FileStory:
                     try:
                         time.sleep(3)
                         create_TTS(
-                            TTSType.GOOGlE,
+                            self.tts_type,
                             sentence_path,
                             sentence.content,
                             self.story.language,
@@ -94,7 +99,6 @@ class FileStory:
                     continue
 
             merge_audio_files(f"paragraph_{paragraph_idx}", paragraph_path)
-            shutil.rmtree(paragraph_path)
 
         return merge_audio_files(
             f"{self.story.title}-{self.story.id}", parent_path

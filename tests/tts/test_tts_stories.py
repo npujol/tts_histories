@@ -1,41 +1,40 @@
 import os
 import tempfile
 from pathlib import Path
-from tts.serializers import TTSType
-from tts.tts_stories import save_text, get_content, read_text, create_TTS
+from tts.serializers import Language, TTSType
+from tts.tts_stories import (
+    create_coqui_tts,
+    save_text,
+    get_content,
+    read_text,
+    create_TTS,
+)
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import pytest
+from tests.tts.conftest import raise_exception
 
 
-# Test save_text function
 def test_save_text():
-    # Create a temporary directory for testing
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir = Path(temp_dir)
-        # Prepare test data
         title = "test_title"
         text = "This is a test text."
         expected_file = temp_dir / f"{title}.txt"
         expected_content = f"{text}"
 
-        # Call the function to save the text
         file_path = save_text(title, text, temp_dir)
 
-        # Assert that the file is created with the correct path and content
         assert file_path == expected_file
         assert expected_file.exists()
         assert expected_file.read_text() == expected_content
 
-        # Clean up the temporary file
         os.remove(expected_file)
 
 
 def test_get_content_successful():
     url = "https://example.com"
-
-    # Mock successful response
     response_content = (
         "<html><head></head><body><h1>Hello World</h1></body></html>"
     )
@@ -60,8 +59,6 @@ def test_get_content_successful():
 
 def test_get_content_http_error():
     url = "https://example.com"
-
-    # Mock HTTPError response
     response = requests.Response()
     response.status_code = 404
     response.raise_for_status = lambda: None
@@ -79,7 +76,6 @@ def test_get_content_http_error():
 def test_get_content_request_exception():
     url = "https://example.com"
 
-    # Mock RequestException response
     def requests_get(*args, **kwargs):  # type: ignore
         return raise_exception(RequestException("Connection error"))
 
@@ -91,18 +87,14 @@ def test_get_content_request_exception():
 
 
 def test_read_text():
-    # Create a temporary file with some text
     with tempfile.NamedTemporaryFile(mode="w+", delete=False) as f:
         f.write("hello\nworld\n")
 
-    # Call the read_text function to read the temporary file
     filename = Path(f.name)
     content = read_text(filename)
 
-    # Check that the function returned the expected content
     assert content == "hello\nworld"
 
-    # Clean up the temporary file
     filename.unlink()
 
 
@@ -135,22 +127,16 @@ def test_read_text_empty_file():
         assert read_text(temp_file_path) == ""
 
 
-@pytest.fixture
-def tts_file():
-    # Create a temporary file
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
-        yield Path(f.name)
-    # Clean up the temporary file
-
-
 def test_create_TTS(tts_file: Path):
-    # Test that TTS file is created successfully
     text = "Hello, world!"
-    language = "en"
+    language = Language.ENGLISH
     create_TTS(TTSType.GOOGlE, tts_file, text, language)
-    assert os.path.exists(tts_file)
+    assert tts_file.exists()
 
 
-# Helper function to raise an exception
-def raise_exception(exception: Exception):
-    raise exception
+@pytest.mark.vcr()
+def test_create_coqui_TTS(tts_file: Path):
+    text = "Hola, mundo!"
+    language = Language.SPANISH
+    create_coqui_tts(tts_file, text, language)
+    assert tts_file.exists()

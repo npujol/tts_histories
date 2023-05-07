@@ -1,10 +1,11 @@
 import logging
 from pathlib import Path
-from tts.serializers import Language
+from tts.serializers import Language, TTSType
 from tts.file import FileStory
 from click.core import Context, Option
 from typing import Optional
 from tts.telegram_handler import send_to_telegram
+from tts.tts_stories import merge_audio_files
 
 import click
 
@@ -71,6 +72,16 @@ def cli():
     """,
 )
 @click.option(
+    "--tts_type",
+    type=click.Choice(TTSType.list()),
+    default=TTSType.GOOGlE,
+    prompt="TTS model Type",
+    help="""Available TTS:
+        GOOGLE = "google"
+        COQUI = "coqui"
+    """,
+)
+@click.option(
     "--file/--no-file",
     is_flag=True,
     default=False,
@@ -88,25 +99,32 @@ def cli():
     default=False,
     callback=prompt_ao3,
 )
-def run(language: Language, wattpad: str, file: str, ao3: str) -> None:
+def run(
+    language: Language,
+    tts_type: TTSType,
+    wattpad: str,
+    file: str,
+    ao3: str,
+) -> None:
     """Runs the tts for the given story"""
     if file:
         file_path = CURRENT_PATH.joinpath(file)
-        story = FileStory(file_path, language)
+        story = FileStory(file_path, language, tts_type)
         story.run()
 
     if wattpad:
         story = Wattpad(url=wattpad, language=language)
         filename = story.save()
         if filename is not None:
-            file_story = FileStory(filename, story.story.language)
+            file_story = FileStory(filename, story.story.language, tts_type)
             file_story.run()
 
     if ao3:
         story = AO3(url=ao3, language=language)
         filename = story.save()
-        file_story = FileStory(filename, story.story.language)
-        file_story.run()
+        if filename is not None:
+            file_story = FileStory(filename, story.story.language, tts_type)
+            file_story.run()
 
 
 @cli.command()
@@ -125,7 +143,7 @@ def run(language: Language, wattpad: str, file: str, ao3: str) -> None:
 )
 def merge(filename: str, path: Path) -> None:
     """Merge *.mp3 files from a path"""
-    # type: ignore(path, filename)
+    merge_audio_files(filename, path)
 
 
 @cli.command()
