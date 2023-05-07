@@ -12,6 +12,7 @@ REAL_WATTPAD_URL = "https://www.wattpad.com/story/157495653-el-tren"
 SIZE = 30
 RETRY_ATTEMPTS = 10
 
+#TODO replace by the builtin tmp_path  fixture
 
 @pytest.fixture(scope="function")
 def temp_dir():
@@ -36,6 +37,8 @@ def wattpad():
     return wp
 
 
+#TODO use the builtin tmp_path  fixture
+
 @pytest.fixture
 def tts_file():
     # Create a temporary file
@@ -43,7 +46,7 @@ def tts_file():
         yield Path(f.name)
     # Clean up the temporary file
 
-
+# TODO Seriously!
 # Helper function to raise an exception
 def raise_exception(exception: Exception):
     raise exception

@@ -34,6 +34,7 @@ class Paragraph(BaseModel):
     audio_path: Optional[Path] = None
     sentences: list[Sentence] = []
 
+# TODO Should we exclude the fields that are not extracted from the site??
 
 class Story(BaseModel):
     title: str = "None"
