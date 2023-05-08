@@ -10,6 +10,7 @@ class Language(str, Enum):
     SPANISH = "es"
     ENGLISH = "en"
     GERMAN = "de"
+    DEFAULT = "es"
 
     @classmethod
     def list(cls):

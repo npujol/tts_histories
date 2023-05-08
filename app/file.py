@@ -82,9 +82,9 @@ class FileStory:
                         time.sleep(3)
                         create_TTS(
                             self.tts_type,
-                            sentence_path,
                             sentence.content,
                             self.story.language,
+                            sentence_path,
                         )
                         break
                     except Exception as e:

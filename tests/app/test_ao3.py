@@ -1,4 +1,4 @@
-from tests.tts.conftest import REAL_AO3_URL
+from tests.app.conftest import REAL_AO3_URL
 from app.ao3 import AO3
 from pathlib import Path
 from app.serializers import Language

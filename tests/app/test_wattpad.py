@@ -1,6 +1,6 @@
 from pathlib import Path
 from app.wattpad import Wattpad, Language
-from tests.tts.conftest import REAL_WATTPAD_URL
+from tests.app.conftest import REAL_WATTPAD_URL
 import pytest
 
 
