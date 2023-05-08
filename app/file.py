@@ -5,9 +5,9 @@ from pathlib import Path
 
 from nltk.tokenize import sent_tokenize  # type: ignore
 
-from tts.serializers import Language, Paragraph, Sentence, Story, TTSType
-from tts.telegram_handler import send_to_telegram
-from tts.tts_stories import merge_audio_files, create_TTS, read_text
+from app.serializers import Language, Paragraph, Sentence, Story, TTSType
+from app.telegram_handler import send_to_telegram
+from app.tts_stories import merge_audio_files, create_TTS, read_text
 
 SIZE = 150
 RETRY_ATTEMPTS = 10

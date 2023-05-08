@@ -1,16 +1,16 @@
 import logging
 from pathlib import Path
-from tts.serializers import Language, TTSType
-from tts.file import FileStory
+from app.serializers import Language, TTSType
+from app.file import FileStory
 from click.core import Context, Option
 from typing import Optional
-from tts.telegram_handler import send_to_telegram
-from tts.tts_stories import merge_audio_files
+from app.telegram_handler import send_to_telegram
+from app.tts_stories import merge_audio_files
 
 import click
 
-from tts.wattpad import Wattpad
-from tts.ao3 import AO3
+from app.wattpad import Wattpad
+from app.ao3 import AO3
 
 
 logging.basicConfig(
@@ -52,13 +52,17 @@ def prompt_ao3(
             value = click.prompt("AO3 story's url")
         return value
 
+
 # TODO Check https://typer.tiangolo.com/
+
 
 @click.group()
 def cli():
     pass
 
+
 # TODO  Autogenerate help choices
+
 
 @cli.command()
 @click.option(
@@ -76,6 +80,7 @@ def cli():
 
 
 # TODO  Autogenerate help choices
+
 
 @click.option(
     "--tts_type",

@@ -10,7 +10,7 @@ from requests.sessions import Session
 from urllib3.util.retry import Retry  # type: ignore
 from TTS.api import TTS  # type: ignore
 import ffmpeg  # type: ignore
-from tts.serializers import Language, TTSType  # type: ignore
+from app.serializers import Language, TTSType  # type: ignore
 
 logger = logging.getLogger(__file__)
 

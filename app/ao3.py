@@ -5,8 +5,8 @@ import re
 import uuid
 from pathlib import Path
 
-from tts.serializers import AO3Story, Language
-from tts.tts_stories import get_content
+from app.serializers import AO3Story, Language
+from app.tts_stories import get_content
 
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")
 
@@ -57,7 +57,6 @@ class AO3:
             text,
         )
         return self.story.text_path
-
 
     # TODO take this out of this class
     def write(self, file_path: Path, content: str):

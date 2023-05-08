@@ -3,8 +3,8 @@
 from typing import Optional
 from urllib.parse import urlparse
 
-from tts.serializers import RawStory
-from tts.loaders._base import AO3Loader
+from app.serializers import RawStory
+from app.loaders._base import AO3Loader
 
 _loaders = [AO3Loader()]
 
