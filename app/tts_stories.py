@@ -113,8 +113,11 @@ def read_text(filename: Path) -> Optional[str]:
 
 
 def create_TTS(
-    type: TTSType, filename: Path, text: str, language: Language
-) -> None:
+    type: TTSType,
+    text: str,
+    language: Language,
+    filename: Path,
+) -> bool:
     """
     Create a Text-to-Speech (TTS) audio file from the given text in
     the specified language and save it to a file.
@@ -139,10 +142,12 @@ def create_TTS(
                 tts.save(f"{filename}.mp3")  # type: ignore
             elif type == TTSType.C0QUI:
                 tts = create_coqui_tts(filename, text, language)
-            break
+
+            return True
         except Exception as e:
             logger.warning(f"Error creating TTS audio: {e}")
             attempts -= 1
+    return False
 
 
 def save_text(title: str, text: str, path: Path) -> Path:
