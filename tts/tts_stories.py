@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 from bs4 import BeautifulSoup
 from gtts import gTTS  # type: ignore
-from requests.adapters import HTTPAdapter
+from requests.adapters import HTTPAdapter, Response
 from requests.sessions import Session
 from urllib3.util.retry import Retry  # type: ignore
 from TTS.api import TTS  # type: ignore
@@ -27,16 +27,15 @@ http_requests.mount("https://", adapter)
 http_requests.mount("http://", adapter)
 
 
-def get_content(url: str) -> Optional[BeautifulSoup]:
+def get_raw_content(url: str) -> Optional[Response]:
     """
-    Retrieve HTML content from a URL and parse it using BeautifulSoup.
+    Retrieve HTML content from a URL.
 
     Args:
         url (str): The URL to fetch the HTML content from.
 
     Returns:
-        BeautifulSoup: A BeautifulSoup object representing the parsed HTML
-        content.
+        bytes: A HTML content.
 
     Raises:
         requests.exceptions.HTTPError: If the HTTP response status code
@@ -48,8 +47,6 @@ def get_content(url: str) -> Optional[BeautifulSoup]:
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        html_content = response.content
-        return BeautifulSoup(html_content, "html.parser")
     except requests.exceptions.HTTPError as e:
         logger.error(f"Error retrieving content from {url}: {e}")
         return None
@@ -59,6 +56,24 @@ def get_content(url: str) -> Optional[BeautifulSoup]:
     except Exception as e:
         logger.error(f"Error making request to {url}: {e}")
         return None
+    if response.status_code == 200:
+        return response
+
+
+def get_content(url: str) -> Optional[BeautifulSoup]:
+    """
+    Retrieve HTML content from a URL and parse it using BeautifulSoup.
+
+    Args:
+        url (str): The URL to fetch the HTML content from.
+
+    Returns:
+        BeautifulSoup: A BeautifulSoup object representing the parsed HTML
+        content.
+    """
+    response = get_raw_content(url)
+    if response:
+        return BeautifulSoup(response.content, "html.parser")
 
 
 def read_text(filename: Path) -> Optional[str]:
