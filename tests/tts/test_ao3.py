@@ -1,7 +1,7 @@
 from tests.tts.conftest import REAL_AO3_URL
-from tts.ao3 import AO3
+from app.ao3 import AO3
 from pathlib import Path
-from tts.serializers import Language
+from app.serializers import Language
 
 import pytest
 

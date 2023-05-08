@@ -1,5 +1,5 @@
 from tests.tts.conftest import REAL_AO3_URL
-from tts.loaders import load_story
+from app.loaders import load_story
 
 import pytest
 

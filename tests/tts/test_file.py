@@ -1,5 +1,5 @@
 import logging
-from tts.file import FileStory
+from app.file import FileStory
 import pytest
 from unittest import mock
 
@@ -34,7 +34,7 @@ def test_file_story_send_to_telegram(
 
     send_to_telegram_mock = mock.Mock()
     monkeypatch.setattr(  # type: ignore
-        "tts.file.send_to_telegram",
+        "app.file.send_to_telegram",
         send_to_telegram_mock,
     )
 

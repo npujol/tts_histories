@@ -6,8 +6,8 @@ import uuid
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from tts.serializers import Chapter, Language, WattpadStory
-from tts.tts_stories import get_content
+from app.serializers import Chapter, Language, WattpadStory
+from app.tts_stories import get_content
 import tempfile
 
 CURRENT_TEMP_PATH = Path(__file__).parent.parent.joinpath("temp")
@@ -93,7 +93,8 @@ class Wattpad:
             url_chapter = (
                 URL_BASE_WATTPAD
                 + html.unescape(ch.get("href"))
-                .replace("\u2022" * 3, "") .strip()
+                .replace("\u2022" * 3, "")
+                .strip()
             )
             self.story.chapters.append(
                 Chapter(

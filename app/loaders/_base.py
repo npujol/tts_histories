@@ -3,12 +3,12 @@ import logging
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from tts.serializers import RawStory
+from app.serializers import RawStory
 from urllib.parse import ParseResult
 import re
 import html
 
-from tts.tts_stories import get_raw_content
+from app.tts_stories import get_raw_content
 
 logger = logging.getLogger(__file__)
 

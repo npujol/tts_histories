@@ -1,8 +1,8 @@
 import os
 import tempfile
 from pathlib import Path
-from tts.serializers import Language, TTSType
-from tts.tts_stories import (
+from app.serializers import Language, TTSType
+from app.tts_stories import (
     create_coqui_tts,
     save_text,
     get_content,
