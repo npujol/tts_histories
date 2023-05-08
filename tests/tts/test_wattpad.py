@@ -32,21 +32,21 @@ def test_save(
 
 
 @pytest.mark.vcr()
-def test_write(wattpad: Wattpad, temp_dir: Path):
+def test_write(wattpad: Wattpad, tmp_path: Path):
     # Check that the _write method works as expected
-    file_path = temp_dir / "test.txt"
+    file_path = tmp_path / "test.txt"
     wattpad._write(file_path, "Test content")  # type: ignore
     assert file_path.read_text() == "Test content"
 
 
 @pytest.mark.vcr()
-def test_rename(wattpad: Wattpad, temp_dir: Path):
+def test_rename(wattpad: Wattpad, tmp_path: Path):
     # Check that the _rename method works as expected
-    old_path = temp_dir / "old.txt"
+    old_path = tmp_path / "old.txt"
     old_path.write_text("Old content")
     new_name = "new"
     wattpad._rename(old_path, new_name)  # type: ignore
-    new_path = temp_dir / f"{new_name}.txt"
+    new_path = tmp_path / f"{new_name}.txt"
     assert not old_path.exists()
     assert new_path.exists()
     assert new_path.read_text() == "Old content"

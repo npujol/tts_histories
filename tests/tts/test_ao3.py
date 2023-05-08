@@ -13,21 +13,21 @@ def test_init():
     assert ao3.story.language == Language.SPANISH
 
 
-def test_write(temp_dir: Path):
-    file_path = temp_dir.joinpath("test.txt")
+def test_write(tmp_path: Path):
+    file_path = tmp_path.joinpath("test.txt")
     ao3 = AO3("https://archiveofourown.org/works/123456")
     ao3.write(file_path, "test content")
     with open(file_path) as f:
         assert f.read() == "test content"
 
 
-def test_rename(temp_dir: Path):
-    file_path = temp_dir.joinpath("test.txt")
+def test_rename(tmp_path: Path):
+    file_path = tmp_path.joinpath("test.txt")
     file_path.touch()
     ao3 = AO3("https://archiveofourown.org/works/123456")
     new_name = "new_file_name"
     ao3.rename(file_path, new_name)
-    new_path = temp_dir.joinpath(f"{new_name}.txt")
+    new_path = tmp_path.joinpath(f"{new_name}.txt")
     assert not file_path.exists()
     assert new_path.exists()
     assert ao3.story.text_path == new_path
@@ -50,9 +50,9 @@ def test_init_unique_file():
 @pytest.mark.vcr()
 def test_ao3_save(
     snapshot,  # type: ignore
-    temp_dir: Path,
+    tmp_path: Path,
 ):
-    temp_file = temp_dir / "temp.txt"
+    temp_file = tmp_path / "temp.txt"
     temp_file.touch()
 
     ao3 = AO3(
