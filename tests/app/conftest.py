@@ -12,13 +12,6 @@ REAL_WATTPAD_URL = "https://www.wattpad.com/story/157495653-el-tren"
 SIZE = 30
 RETRY_ATTEMPTS = 10
 
-# TODO replace by the builtin tmp_path  fixture
-
-# @pytest.fixture(scope="function")
-# def tmp_path():
-#     with tempfile.TemporaryDirectory() as tmp_path:
-#         yield Path(tmp_path)
-
 
 @pytest.fixture(scope="function")
 def file_story(tmp_path: Path):
@@ -32,7 +25,6 @@ def file_story(tmp_path: Path):
 
 @pytest.fixture(scope="function")
 def wattpad():
-    # Create a new Wattpad object for testing
     wp = Wattpad(REAL_WATTPAD_URL, language=Language.ENGLISH)
     return wp
 
@@ -42,13 +34,5 @@ def wattpad():
 
 @pytest.fixture
 def tts_file():
-    # Create a temporary file
     with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
         yield Path(f.name)
-    # Clean up the temporary file
-
-
-# TODO Seriously!
-# Helper function to raise an exception
-def raise_exception(exception: Exception):
-    raise exception
