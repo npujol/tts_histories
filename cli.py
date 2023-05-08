@@ -11,6 +11,7 @@ import click
 
 from app.wattpad import Wattpad
 from app.ao3 import AO3
+from app.main import make_tts
 
 
 logging.basicConfig(
@@ -166,6 +167,38 @@ def merge(filename: str, path: Path) -> None:
 )
 def send(path: Path) -> None:
     send_to_telegram(path, "temp")
+
+
+@cli.command()
+@click.option(
+    "--url",
+    default="UNKNOWN",
+    type=str,
+    prompt="url",
+    help="url for the output, default value is UNKNOWN",
+)
+@click.option(
+    "--language",
+    type=click.Choice(Language.list()),
+    default=Language.SPANISH,
+    prompt="Story's language",
+    help="""Story's language.
+        Available languages:
+        SPANISH = "es-ES"
+        ENGLISH = "en-US"
+        GERMAN = "de-DE"
+    """,
+)
+@click.option(
+    "--path",
+    type=Path,
+    default="/home/naivy/Datos/tts__file_output/",
+    prompt="Folder's path",
+    help="Path for the output with the *.mp3 files",
+)
+def make_tts_coqui(url: str, language: Language, path: Path) -> None:
+    """Merge *.mp3 files from a path"""
+    make_tts(url, language=language, to_save_path=path)
 
 
 if __name__ == "__main__":
