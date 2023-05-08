@@ -34,7 +34,9 @@ class Paragraph(BaseModel):
     audio_path: Optional[Path] = None
     sentences: list[Sentence] = []
 
+
 # TODO Should we exclude the fields that are not extracted from the site??
+
 
 class Story(BaseModel):
     title: str = "None"
@@ -42,6 +44,13 @@ class Story(BaseModel):
     saved_text_path: Path
     language: Language = Language.SPANISH
     content: list[Paragraph] = []
+
+
+class RawStory(BaseModel):
+    url: str
+    title: str = ""
+    language: Optional[Language] = None
+    content: str = ""
 
 
 class Chapter(BaseModel):
