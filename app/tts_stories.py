@@ -221,6 +221,6 @@ def create_coqui_tts(filename: Path, text: str, language: Language):
     )
     tts.tts_to_file(
         text,
-        file_path=f"{filename}.mp3",
+        file_path=f"{filename}",
     )
-    return f"{filename}.mp3"
+    return f"{filename}"

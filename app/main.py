@@ -24,5 +24,5 @@ def make_tts(
             tts_type,
             story.content,
             language or story.language or Language.DEFAULT,
-            path,
+            path / story.title,
         )
