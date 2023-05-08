@@ -9,7 +9,7 @@ from tts.serializers import Language, Paragraph, Sentence, Story, TTSType
 from tts.telegram_handler import send_to_telegram
 from tts.tts_stories import merge_audio_files, create_TTS, read_text
 
-SIZE = 30
+SIZE = 150
 RETRY_ATTEMPTS = 10
 logger = logging.getLogger(__file__)
 

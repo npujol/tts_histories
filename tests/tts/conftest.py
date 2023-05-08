@@ -14,16 +14,16 @@ RETRY_ATTEMPTS = 10
 
 #TODO replace by the builtin tmp_path  fixture
 
-@pytest.fixture(scope="function")
-def temp_dir():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield Path(temp_dir)
+# @pytest.fixture(scope="function")
+# def tmp_path():
+#     with tempfile.TemporaryDirectory() as tmp_path:
+#         yield Path(tmp_path)
 
 
 @pytest.fixture(scope="function")
-def file_story(temp_dir: Path):
+def file_story(tmp_path: Path):
     text = "This is a sample text for testing purposes. It contains multiple sentences."
-    file_path = temp_dir / "test.txt"
+    file_path = tmp_path / "test.txt"
     with open(file_path, "w") as f:
         f.write(text)
     story = FileStory(file_path)
