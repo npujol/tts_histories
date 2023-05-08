@@ -16,7 +16,6 @@ def make_tts(
 ):
     story = load_story(url)
     if story:
-        story.content = "Esto es el contenido"
         path = to_save_path or Path(
             tempfile.NamedTemporaryFile(delete=False).name
         )
