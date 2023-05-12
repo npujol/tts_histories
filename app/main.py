@@ -9,12 +9,12 @@ from app.tts_stories import create_TTS
 
 
 def make_tts(
-    url: str,
+    source: str,
     tts_type: TTSType = TTSType.C0QUI,
     language: Optional[Language] = None,
     to_save_path: Optional[Path] = None,
 ):
-    story = load_story(url)
+    story = load_story(source)
     if story:
         path = to_save_path or Path(
             tempfile.NamedTemporaryFile(delete=False).name

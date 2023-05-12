@@ -171,11 +171,11 @@ def send(path: Path) -> None:
 
 @cli.command()
 @click.option(
-    "--url",
+    "--source",
     default="UNKNOWN",
     type=str,
-    prompt="url",
-    help="url for the output, default value is UNKNOWN",
+    prompt="source",
+    help="source for the output, default value is UNKNOWN",
 )
 @click.option(
     "--language",
@@ -196,9 +196,9 @@ def send(path: Path) -> None:
     prompt="Folder's path",
     help="Path for the output with the *.mp3 files",
 )
-def make_tts_coqui(url: str, language: Language, path: Path) -> None:
+def make_tts_coqui(source: str, language: Language, path: Path) -> None:
     """Merge *.mp3 files from a path"""
-    make_tts(url, language=language, to_save_path=path)
+    make_tts(source, language=language, to_save_path=path)
 
 
 if __name__ == "__main__":
