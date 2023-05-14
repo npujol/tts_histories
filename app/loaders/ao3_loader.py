@@ -1,5 +1,3 @@
-
-
 from bs4 import BeautifulSoup
 from app.serializers import RawStory
 from urllib.parse import urlparse
@@ -13,15 +11,17 @@ import re
 
 logger = logging.getLogger(__file__)
 
-AO3_REGEX = re.compile(
-    r"^https://archiveofourown\.org/downloads/\d+/.+\.html\?updated_at=\d+$"
-)
+AO3_HOSTNAME = "archiveofourown.org"
+AO3_REGEX = re.compile(r"^\/downloads\/\d+/[a-zA-Z0-9%-]+\.html$")
+
 
 class AO3Loader(Base):
     def can_handle(self, source: str) -> bool:
         try:
             parsed_url = urlparse(source)
-            return bool(AO3_REGEX.match(parsed_url.geturl()))
+            return parsed_url.hostname == AO3_HOSTNAME and bool(
+                AO3_REGEX.match(parsed_url.path)
+            )
         except Exception:
             return False
 
