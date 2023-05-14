@@ -19,6 +19,7 @@ class FileLoader(Base):
             return False
 
     def load(self, source: str) -> RawStory:
+        logger.info(f"Starting to load content from {source}")
         return RawStory(
             title=str(source).split(".")[0],  # type: ignore
             url=source,

@@ -1,12 +1,11 @@
-# from ao3 import AO3Loader
-# from wattpad import WTFLoader
 from typing import Optional
 
 from app.serializers import RawStory
 from app.loaders.ao3_loader import AO3Loader
+from app.loaders.wattpad_loader import WattpadLoader, WattpadChapterLoader
 from app.loaders.file_loader import FileLoader
 
-_loaders = [AO3Loader(), FileLoader()]
+_loaders = [AO3Loader(), FileLoader(), WattpadLoader(), WattpadChapterLoader()]
 
 
 def load_story(source: str) -> Optional[RawStory]:
