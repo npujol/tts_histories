@@ -62,35 +62,24 @@ def cli():
     pass
 
 
-# TODO  Autogenerate help choices
-
-
 @cli.command()
 @click.option(
     "--language",
     type=click.Choice(Language.list()),
     default=Language.SPANISH,
     prompt="Story's language",
-    help="""Story's language.
+    help=f"""Story's language.
         Available languages:
-        SPANISH = "es-ES"
-        ENGLISH = "en-US"
-        GERMAN = "de-DE"
+        {Language.available_str_values()}
     """,
 )
-
-
-# TODO  Autogenerate help choices
-
-
 @click.option(
     "--tts_type",
     type=click.Choice(TTSType.list()),
     default=TTSType.GOOGlE,
     prompt="TTS model Type",
-    help="""Available TTS:
-        GOOGLE = "google"
-        COQUI = "coqui"
+    help=f"""Available TTS:
+        {TTSType.available_str_values()}
     """,
 )
 @click.option(
@@ -182,11 +171,10 @@ def send(path: Path) -> None:
     type=click.Choice(Language.list()),
     default=Language.SPANISH,
     prompt="Story's language",
-    help="""Story's language.
+    help=f"""Story's language.
         Available languages:
-        SPANISH = "es-ES"
-        ENGLISH = "en-US"
-        GERMAN = "de-DE"
+        {Language.available_str_values()}
+
     """,
 )
 @click.option(
