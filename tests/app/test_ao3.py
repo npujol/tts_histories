@@ -1,4 +1,4 @@
-from tests.app.conftest import REAL_AO3_URL
+from tests.app.conftest import REAL_AO3_URL, TEST_AO3_URL
 from app.ao3 import AO3
 from pathlib import Path
 from app.serializers import Language
@@ -7,15 +7,14 @@ import pytest
 
 
 def test_init():
-    url = "https://archiveofourown.org/works/123456"
-    ao3 = AO3(url)
-    assert ao3.story.url == url
+    ao3 = AO3(TEST_AO3_URL)
+    assert ao3.story.url == TEST_AO3_URL
     assert ao3.story.language == Language.SPANISH
 
 
 def test_write(tmp_path: Path):
     file_path = tmp_path.joinpath("test.txt")
-    ao3 = AO3("https://archiveofourown.org/works/123456")
+    ao3 = AO3(TEST_AO3_URL)
     ao3.write(file_path, "test content")
     with open(file_path) as f:
         assert f.read() == "test content"
@@ -24,7 +23,7 @@ def test_write(tmp_path: Path):
 def test_rename(tmp_path: Path):
     file_path = tmp_path.joinpath("test.txt")
     file_path.touch()
-    ao3 = AO3("https://archiveofourown.org/works/123456")
+    ao3 = AO3(TEST_AO3_URL)
     new_name = "new_file_name"
     ao3.rename(file_path, new_name)
     new_path = tmp_path.joinpath(f"{new_name}.txt")
@@ -34,13 +33,12 @@ def test_rename(tmp_path: Path):
 
 
 def test_init_creates_file():
-    url = "https://archiveofourown.org/works/123456"
-    ao3 = AO3(url)
+    ao3 = AO3(TEST_AO3_URL)
     assert ao3.story.text_path.exists()
 
 
 def test_init_unique_file():
-    url1 = "https://archiveofourown.org/works/123456"
+    url1 = TEST_AO3_URL
     url2 = "https://archiveofourown.org/works/654321"
     ao3_1 = AO3(url1)
     ao3_2 = AO3(url2)
