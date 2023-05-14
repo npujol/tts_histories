@@ -6,24 +6,26 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class Language(str, Enum):
+class StrEnumBase(str, Enum):
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
+    @classmethod
+    def available_str_values(cls):
+        return "\n".join(v for v in list(cls))
+
+
+class Language(StrEnumBase):
     SPANISH = "es"
     ENGLISH = "en"
     GERMAN = "de"
     DEFAULT = "es"
 
-    @classmethod
-    def list(cls):
-        return list(map(lambda c: c.value, cls))
 
-
-class TTSType(str, Enum):
+class TTSType(StrEnumBase):
     GOOGlE = "google"
     C0QUI = "coqui"
-
-    @classmethod
-    def list(cls):
-        return list(map(lambda c: c.value, cls))
 
 
 class Sentence(BaseModel):
