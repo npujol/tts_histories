@@ -1451,6 +1451,21 @@ files = [
 ]
 
 [[package]]
+name = "langdetect"
+version = "1.0.9"
+description = "Language detection library ported from Google's language-detection."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "langdetect-1.0.9-py2-none-any.whl", hash = "sha256:7cbc0746252f19e76f77c0b1690aadf01963be835ef0cd4b56dddf2a8f1dfc2a"},
+    {file = "langdetect-1.0.9.tar.gz", hash = "sha256:cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0"},
+]
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 name = "lazy-loader"
 version = "0.2"
 description = "lazy_loader"
@@ -3968,4 +3983,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.x"
-content-hash = "0af7f52bafa13eef5dcdd248b223ba655f7c482fcb234f80e46a615e73f5c621"
+content-hash = "4d6f7d06dcb233cdf17b9973dc80bd92971a08bc6b1529491cbc42fcbaaaa664"

@@ -1,9 +1,11 @@
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
+from langdetect import detect
+from pydantic import BaseModel, root_validator
 
-from pydantic import BaseModel
+MIN_SIZE = 5000
 
 
 class StrEnumBase(str, Enum):
@@ -38,9 +40,6 @@ class Paragraph(BaseModel):
     sentences: list[Sentence] = []
 
 
-# TODO Should we exclude the fields that are not extracted from the site??
-
-
 class Story(BaseModel):
     title: str = "None"
     id: uuid.UUID
@@ -54,6 +53,17 @@ class RawStory(BaseModel):
     title: str = ""
     language: Optional[Language] = None
     content: str = ""
+
+    @root_validator(pre=True)
+    def extract_language(cls, values: dict[str, Any]):
+        language = values.get("language", None)
+        content = values.get("content", None)
+        if language is None and content is not None:
+            to_check = (
+                content if len(content) < MIN_SIZE else content[:MIN_SIZE]
+            )
+            values["language"] = detect(to_check)
+        return values
 
 
 class Chapter(BaseModel):
