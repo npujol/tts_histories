@@ -1,11 +1,10 @@
-from tests.app.conftest import (
-    REAL_AO3_URL,
-    REAL_WATTPAD_CHAPTER_URL,
-    REAL_WATTPAD_URL,
-)
 from app.loaders import load_story
 
 import pytest
+
+REAL_AO3_URL = "https://archiveofourown.org/downloads/41826891/Complicidad.html?updated_at=1677757090"
+REAL_WATTPAD_URL = "https://www.wattpad.com/story/157495653-el-tren"
+REAL_WATTPAD_CHAPTER_URL = "https://www.wattpad.com/613460718-el-tren"
 
 
 @pytest.mark.vcr()
