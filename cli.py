@@ -1,16 +1,12 @@
 import logging
 from pathlib import Path
-from app.serializers import Language, TTSType
-from app.file import FileStory
+from app.serializers import TTSType
 from click.core import Context, Option
 from typing import Optional
 from app.telegram_handler import send_to_telegram
-from app.tts_stories import merge_audio_files
 
 import click
 
-from app.wattpad import Wattpad
-from app.ao3 import AO3
 from app.main import make_tts
 
 
@@ -60,91 +56,6 @@ def prompt_ao3(
 @click.group()
 def cli():
     pass
-
-
-@cli.command()
-@click.option(
-    "--language",
-    type=click.Choice(Language.list()),
-    default=Language.SPANISH,
-    prompt="Story's language",
-    help=f"""Story's language.
-        Available languages:
-        {Language.available_str_values()}
-    """,
-)
-@click.option(
-    "--tts_type",
-    type=click.Choice(TTSType.list()),
-    default=TTSType.GOOGlE,
-    prompt="TTS model Type",
-    help=f"""Available TTS:
-        {TTSType.available_str_values()}
-    """,
-)
-@click.option(
-    "--file/--no-file",
-    is_flag=True,
-    default=False,
-    callback=prompt_file,
-)
-@click.option(
-    "--wattpad/--no-wattpad",
-    is_flag=True,
-    default=False,
-    callback=prompt_wattpad,
-)
-@click.option(
-    "--ao3/--no-ao3",
-    is_flag=True,
-    default=False,
-    callback=prompt_ao3,
-)
-def run(
-    language: Language,
-    tts_type: TTSType,
-    wattpad: str,
-    file: str,
-    ao3: str,
-) -> None:
-    """Runs the tts for the given story"""
-    if file:
-        file_path = CURRENT_PATH.joinpath(file)
-        story = FileStory(file_path, language, tts_type)
-        story.run()
-
-    if wattpad:
-        story = Wattpad(url=wattpad, language=language)
-        filename = story.save()
-        if filename is not None:
-            file_story = FileStory(filename, story.story.language, tts_type)
-            file_story.run()
-
-    if ao3:
-        story = AO3(url=ao3, language=language)
-        filename = story.save()
-        if filename is not None:
-            file_story = FileStory(filename, story.story.language, tts_type)
-            file_story.run()
-
-
-@cli.command()
-@click.option(
-    "--filename",
-    default="UNKNOWN",
-    type=str,
-    prompt="Filename",
-    help="Filename for the output, default value is UNKNOWN",
-)
-@click.option(
-    "--path",
-    type=Path,
-    prompt="Folder's path",
-    help="Path for the output with the *.mp3 files",
-)
-def merge(filename: str, path: Path) -> None:
-    """Merge *.mp3 files from a path"""
-    merge_audio_files(filename, path)
 
 
 @cli.command()
