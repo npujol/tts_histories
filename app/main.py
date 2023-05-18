@@ -4,6 +4,7 @@ import tempfile
 from typing import Optional
 from app.loaders import load_story
 from app.tts_processors import process_story
+from app.telegram_handler import send_to_telegram
 
 
 from app.serializers import TTSType
@@ -15,6 +16,7 @@ def make_tts(
     source: str,
     tts_type: TTSType = TTSType.C0QUI,
     out_path: Optional[Path] = None,
+    shall_send_to_telegram: bool = False,
 ):
     story = load_story(source)
     if story is None:
@@ -24,4 +26,10 @@ def make_tts(
     name = story.title.replace(" ", "_") or "out"
     file_path = path.joinpath(f"{name}.mp3") if path.is_dir() else path
 
-    return process_story(story=story, out_path=file_path, tts_type=tts_type)
+    tts_path = process_story(
+        story=story, out_path=file_path, tts_type=tts_type
+    )
+
+    if shall_send_to_telegram and tts_path is not None:
+        send_to_telegram(path=tts_path, name=story.title)
+    return tts_path

@@ -198,14 +198,24 @@ def make_tts_coqui(source: str, out_path: Path) -> None:
     is_flag=True,
     default=False,
 )
-def run_tts(source: str, out_path: Path, google: bool):
+@click.option(
+    "--telegram/--no-send",
+    is_flag=True,
+    default=False,
+)
+def run_tts(source: str, out_path: Path, google: bool, telegram: bool):
     if google:
         return make_tts(
             source=source,
             tts_type=TTSType.GOOGlE,
             out_path=out_path,
+            shall_send_to_telegram=telegram,
         )
-    return make_tts(source=source, out_path=out_path)
+    return make_tts(
+        source=source,
+        out_path=out_path,
+        shall_send_to_telegram=telegram,
+    )
 
 
 if __name__ == "__main__":
