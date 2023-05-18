@@ -199,14 +199,13 @@ def make_tts_coqui(source: str, out_path: Path) -> None:
     default=False,
 )
 def run_tts(source: str, out_path: Path, google: bool):
-    path = out_path.joinpath("out.mp3") if out_path.is_dir() else out_path
     if google:
         return make_tts(
             source=source,
             tts_type=TTSType.GOOGlE,
-            out_path=path,
+            out_path=out_path,
         )
-    return make_tts(source=source, out_path=path)
+    return make_tts(source=source, out_path=out_path)
 
 
 if __name__ == "__main__":
