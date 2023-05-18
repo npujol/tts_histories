@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 from app.serializers import RawStory
 import logging
@@ -7,8 +5,8 @@ from app.loaders._base import Base
 from app.tts_stories import read_text
 
 
-
 logger = logging.getLogger(__file__)
+
 
 class FileLoader(Base):
     def can_handle(self, source: str) -> bool:
@@ -23,5 +21,5 @@ class FileLoader(Base):
         return RawStory(
             title=str(source).split(".")[0],  # type: ignore
             url=source,
-            content=read_text(Path(source))
+            content=read_text(Path(source)),
         )

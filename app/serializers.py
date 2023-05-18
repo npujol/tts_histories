@@ -2,7 +2,7 @@ import uuid
 from enum import Enum
 from pathlib import Path
 from typing import Any, Optional
-from langdetect import detect #type: ignore
+from langdetect import detect  # type: ignore
 from pydantic import BaseModel, root_validator
 
 MIN_SIZE = 5000
