@@ -26,6 +26,7 @@ def test_default_tts_coqui_process(
     out_path.unlink()
 
 
+@pytest.mark.skip("TODO wait to unlock google api")
 @pytest.mark.vcr()
 def test_default_tts_google_process(
     tmp_path: Path,
