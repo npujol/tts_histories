@@ -4,14 +4,13 @@ from app.serializers import RawStory, TTSType
 from app.tts_processors.coqui import CoquiTTS
 from app.tts_processors.google import GoogleTTS
 
-_tta_processors = [CoquiTTS(), GoogleTTS()]
-
 
 def process_story(
     story: RawStory,
     out_path: Path,
     tts_type: TTSType = TTSType.C0QUI,
 ) -> Optional[Path]:
-    for processor in _tta_processors:  # type: ignore
-        if processor.can_handle(story, tts_type):  # type: ignore
-            return processor.make(story, out_path)  # type: ignore
+    if tts_type == TTSType.C0QUI:
+        return CoquiTTS(story=story).make(out_path)
+    elif tts_type == TTSType.GOOGlE:
+        return GoogleTTS(story=story).make(out_path)
