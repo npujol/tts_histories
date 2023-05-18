@@ -167,26 +167,46 @@ def send(path: Path) -> None:
     help="source for the output, default value is UNKNOWN",
 )
 @click.option(
-    "--language",
-    type=click.Choice(Language.list()),
-    default=Language.SPANISH,
-    prompt="Story's language",
-    help=f"""Story's language.
-        Available languages:
-        {Language.available_str_values()}
-
-    """,
-)
-@click.option(
-    "--path",
+    "--out_path",
     type=Path,
     default="/home/naivy/Datos/tts__file_output/",
     prompt="Folder's path",
     help="Path for the output with the *.mp3 files",
 )
-def make_tts_coqui(source: str, language: Language, path: Path) -> None:
-    """Merge *.mp3 files from a path"""
-    make_tts(source, language=language, to_save_path=path)
+def make_tts_coqui(source: str, out_path: Path) -> None:
+    path = out_path.joinpath("out.mp3") if out_path.is_dir() else out_path
+    make_tts(source=source, out_path=path)
+
+
+@cli.command()
+@click.option(
+    "--source",
+    default="UNKNOWN",
+    type=str,
+    prompt="source",
+    help="source for the output, default value is UNKNOWN",
+)
+@click.option(
+    "--out_path",
+    type=Path,
+    default="/home/naivy/Datos/tts__file_output/",
+    prompt="Folder's path",
+    help="Path for the output with the *.mp3 files",
+)
+@click.option(
+    "--google/--no-google",
+    is_flag=True,
+    default=False,
+)
+def run_tts(source: str, out_path: Path, google: bool):
+    path = out_path.joinpath("out.mp3") if out_path.is_dir() else out_path
+    if google:
+        return make_tts(
+            source=source,
+            tts_type=TTSType.GOOGlE,
+            out_path=path,
+        )
+    return make_tts(source=source, out_path=path)
 
 
 if __name__ == "__main__":

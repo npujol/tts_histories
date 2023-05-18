@@ -1,28 +1,25 @@
+import logging
 from pathlib import Path
 import tempfile
 from typing import Optional
 from app.loaders import load_story
+from app.tts_processors import process_story
 
 
-from app.serializers import Language, TTSType
-from app.tts_stories import create_TTS
+from app.serializers import TTSType
+
+logger = logging.getLogger(__name__)
 
 
 def make_tts(
     source: str,
     tts_type: TTSType = TTSType.C0QUI,
-    language: Optional[Language] = None,
-    to_save_path: Optional[Path] = None,
+    out_path: Optional[Path] = None,
 ):
     story = load_story(source)
-    if story:
-        path = to_save_path or Path(
-            tempfile.NamedTemporaryFile(delete=False).name
-        )
+    if story is None:
+        logger.error("The content couldn't be processed.")
+        return
 
-        return create_TTS(
-            tts_type,
-            story.content,
-            language or story.language or Language.DEFAULT,
-            path / story.title,
-        )
+    path = out_path or Path(tempfile.NamedTemporaryFile(delete=False).name)
+    return process_story(story=story, out_path=path, tts_type=tts_type)

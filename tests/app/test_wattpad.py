@@ -12,9 +12,7 @@ def test_init(
     assert wattpad.story.url == REAL_WATTPAD_URL
     assert wattpad.story.language == Language.ENGLISH
     assert isinstance(wattpad.story.text_path, Path)
-    assert snapshot() == "|".join(
-        sorted(p.json() for p in wattpad.story.chapters)
-    )
+    assert snapshot() == "|".join(sorted(p.json() for p in wattpad.story.chapters))
 
 
 @pytest.mark.vcr()
@@ -25,9 +23,7 @@ def test_save(
     # Check that the save method works as expected
     path = wattpad.save()
     if path is not None:
-        assert snapshot() == "|".join(
-            sorted(ch.text for ch in wattpad.story.chapters)
-        )
+        assert snapshot() == "|".join(sorted(ch.text for ch in wattpad.story.chapters))
         assert isinstance(path, Path)
 
 
