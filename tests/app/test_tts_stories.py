@@ -1,8 +1,8 @@
 import os
 import tempfile
 from pathlib import Path
-from tts.serializers import Language, TTSType
-from tts.tts_stories import (
+from app.serializers import Language, TTSType
+from app.tts_stories import (
     create_coqui_tts,
     save_text,
     get_content,
@@ -13,7 +13,6 @@ import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import pytest
-from tests.tts.conftest import raise_exception
 
 
 def test_save_text():
@@ -77,7 +76,7 @@ def test_get_content_request_exception():
     url = "https://example.com"
 
     def requests_get(*args, **kwargs):  # type: ignore
-        return raise_exception(RequestException("Connection error"))
+        raise RequestException("Connection error")
 
     requests.get = requests_get
 
@@ -130,7 +129,12 @@ def test_read_text_empty_file():
 def test_create_TTS(tts_file: Path):
     text = "Hello, world!"
     language = Language.ENGLISH
-    create_TTS(TTSType.GOOGlE, tts_file, text, language)
+    create_TTS(
+        TTSType.GOOGlE,
+        text,
+        language,
+        tts_file,
+    )
     assert tts_file.exists()
 
 

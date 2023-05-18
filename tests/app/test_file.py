@@ -1,5 +1,5 @@
 import logging
-from tts.file import FileStory
+from app.file import FileStory
 import pytest
 from unittest import mock
 
@@ -12,6 +12,7 @@ def test_file_story_extract_content(file_story: FileStory):
     assert len(file_story.story.content[0].sentences) == 2
 
 
+@pytest.mark.skip("TODO wait to unlock google api")
 def test_file_story_create_audio(file_story: FileStory):
     file_story.tokenize()
     file_path = file_story.create_audio()
@@ -34,7 +35,7 @@ def test_file_story_send_to_telegram(
 
     send_to_telegram_mock = mock.Mock()
     monkeypatch.setattr(  # type: ignore
-        "tts.file.send_to_telegram",
+        "app.file.send_to_telegram",
         send_to_telegram_mock,
     )
 

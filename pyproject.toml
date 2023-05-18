@@ -146,6 +146,8 @@ flake8 = "*"
 pytest = "*"
 tts = "^0.13.3"
 ffmpeg-python = "^0.2.0"
+langdetect = "^1.0.9"
+environs = "^9.5.0"
 
 
 [build-system]
