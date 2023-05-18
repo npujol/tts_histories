@@ -14,9 +14,5 @@ class Base(ABC):
         ...
 
     @abstractmethod
-    def clean(self, story: RawStory) -> Path:
-        ...
-
-    @abstractmethod
-    def make(self, story: RawStory, file_path: Path) -> Path | None:
+    def make(self, story: RawStory, out_path: Path) -> Path | None:
         ...

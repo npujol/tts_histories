@@ -1,4 +1,3 @@
-from abc import abstractmethod
 import logging
 from pathlib import Path
 from gtts import gTTS  # type: ignore
@@ -20,17 +19,13 @@ class GoogleTTS(Base):
             and story.language is not None
         )
 
-    @abstractmethod
-    def clean(self, story: RawStory) -> Path:
-        ...
-
-    def make(self, story: RawStory, file_path: Path) -> Path | None:
+    def make(self, story: RawStory, out_path: Path) -> Path | None:
         attempts = 5
         while attempts:
             try:
                 tts = gTTS(story.content, lang=story.language)  # type: ignore
-                tts.save(f"{file_path}.mp3")  # type: ignore
-                return file_path
+                tts.save(str(out_path))  # type: ignore
+                return out_path
             except Exception as e:
                 logger.warning(f"Error creating TTS audio: {e}")
                 attempts -= 1

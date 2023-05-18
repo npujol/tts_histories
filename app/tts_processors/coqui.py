@@ -1,4 +1,3 @@
-from abc import abstractmethod
 import logging
 from pathlib import Path
 from typing import Optional
@@ -22,12 +21,8 @@ class CoquiTTS(Base):
             and story.language is not None
         )
 
-    @abstractmethod
-    def clean(self, story: RawStory) -> Path:
-        ...
-
-    def make(self, story: RawStory, file_path: Path) -> Optional[Path]:
-        if isinstance(story.language, Language) and not story.content:
+    def make(self, story: RawStory, out_path: Path) -> Optional[Path]:
+        if isinstance(story.language, Language) and story.content:
             model = MAP_LANGUAGE_MODEL.get(story.language, None)
             if model is None:
                 list_models: list[str] = [
@@ -45,6 +40,6 @@ class CoquiTTS(Base):
             )
             tts.tts_to_file(
                 story.content,
-                file_path=f"{file_path}",
+                file_path=f"{out_path}",
             )
-            return file_path
+            return out_path
