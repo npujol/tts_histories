@@ -1,8 +1,9 @@
 from pathlib import Path
-from tests.app.conftest import REAL_AO3_URL
 from app.main import make_tts
 
 import pytest
+
+from app.tests.conftest import REAL_AO3_URL
 
 
 @pytest.mark.vcr()
