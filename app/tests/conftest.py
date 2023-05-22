@@ -1,6 +1,5 @@
 import pytest
 
-import tempfile
 from pathlib import Path
 
 
@@ -13,6 +12,7 @@ RETRY_ATTEMPTS = 10
 
 
 @pytest.fixture
-def tts_file():
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
-        yield Path(f.name)
+def tts_file(tmp_path: Path ):
+    file_path = tmp_path / "hello.txt"
+    file_path.write_text("hello")
+    return file_path
