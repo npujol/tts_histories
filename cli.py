@@ -1,8 +1,6 @@
 import logging
 from pathlib import Path
 from app.serializers import TTSType
-from click.core import Context, Option
-from typing import Optional
 from app.telegram_handler import send_to_telegram
 
 import click
@@ -38,7 +36,7 @@ def send(path: Path) -> None:
     "--source",
     type=str,
     prompt="source",
-    help="source for the output, can be a url or a path,
+    help="source for the output, can be a url or a path"
 )
 @click.option(
     "--out_path",
