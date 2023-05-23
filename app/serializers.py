@@ -65,7 +65,6 @@ class RawStory(BaseModel):
             values["language"] = detect(to_check)
         return values
 
-
 class Chapter(BaseModel):
     id: uuid.UUID
     url: str

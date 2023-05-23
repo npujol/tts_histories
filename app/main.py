@@ -36,7 +36,7 @@ def make_tts(
 
     if shall_save_text:
         text_path = path.joinpath(f"{name}.txt") if path.is_dir() else path
-        story.write(text_path, story.content)
+        text_path.write_text(story.content)
         if shall_send_to_telegram:
             send_to_telegram(path=text_path, name=story.title)
 
