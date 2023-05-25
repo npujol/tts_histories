@@ -24,7 +24,7 @@ def make_tts(
         logger.error("The content couldn't be processed.")
         return
     path = out_path or Path(tempfile.NamedTemporaryFile(delete=False).name)
-    name = story.title.replace(" ", "_") or "out"
+    name = story.title or "out"
     file_path = path.joinpath(f"{name}.mp3") if path.is_dir() else path
    
     tts_path = process_story(
