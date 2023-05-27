@@ -26,7 +26,10 @@ class Base(ABC):
         sentences: list[Iterable[str]] = [
             iter(cleaner.segment(self.story.content))  # type: ignore
         ] * self.sentence_count
-        return (" ".join(v) for v in zip_longest(*sentences, fillvalue=""))
+        return (
+            " ".join(v for v in part if v).strip()
+            for part in zip_longest(*sentences, fillvalue="")
+        )
 
     def make(self, out_path: Path) -> Optional[Path]:
         temp_files: list[str] = []
