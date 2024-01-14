@@ -6,8 +6,11 @@ from app.tts_processors._base import Base
 from TTS.api import TTS  # type: ignore
 
 
-MAP_LANGUAGE_MODEL = {Language.SPANISH: "tts_models/es/css10/vits"}
-SENTENCE_COUNT = 200
+MAP_LANGUAGE_MODEL = {
+    Language.SPANISH: "tts_models/es/css10/vits",
+    # Language.GERMAN: "tts_models/de/css10/vits",
+}
+SENTENCE_COUNT = 100
 
 
 logger = logging.getLogger(__file__)

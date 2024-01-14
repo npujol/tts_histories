@@ -15,6 +15,7 @@ logging.basicConfig(
 
 CURRENT_PATH = Path(__file__).parent
 
+
 @click.group()
 def cli():
     pass
@@ -36,7 +37,7 @@ def send(path: Path) -> None:
     "--source",
     type=str,
     prompt="source",
-    help="source for the output, can be a url or a path"
+    help="source for the output, can be a url or a path",
 )
 @click.option(
     "--out_path",
