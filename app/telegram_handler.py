@@ -16,9 +16,7 @@ config = loads((Path.home() / ".config/telegram-upload.json").read_text())
 def send_to_telegram(path: Path, name: str):
     logger.info("Starting to send file to telegram.")
     if not channel_id:
-        logger.error(
-            f"Error sending file: {name} to telegram, missing channel id."
-        )
+        logger.error(f"Error sending file: {name} to telegram, missing channel id.")
         return
     with TelegramClient("tts_stories", **config) as client:  # type: ignore
         message = client.send_file(  # type: ignore

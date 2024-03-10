@@ -51,7 +51,7 @@ class Story(BaseModel):
 class RawStory(BaseModel):
     url: str
     title: str = ""
-    language: Optional[Language] = None
+    language: Language
     content: str = ""
 
     @root_validator(pre=True)

@@ -12,7 +12,7 @@ RETRY_ATTEMPTS = 10
 
 
 @pytest.fixture
-def tts_file(tmp_path: Path ):
+def tts_file(tmp_path: Path):
     file_path = tmp_path / "hello.txt"
     file_path.write_text("hello")
     return file_path

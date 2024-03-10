@@ -34,9 +34,7 @@ def test_save_text():
 
 def test_get_content_successful():
     url = "https://example.com"
-    response_content = (
-        "<html><head></head><body><h1>Hello World</h1></body></html>"
-    )
+    response_content = "<html><head></head><body><h1>Hello World</h1></body></html>"
     response = requests.Response()
     response._content = response_content.encode("utf-8")
     response.status_code = 200
