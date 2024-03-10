@@ -219,7 +219,7 @@ def create_coqui_tts(filename: Path, text: str, language: Language):
         progress_bar=False,
         gpu=False,
     )
-    tts.tts_to_file(
+    tts.tts_to_file(  # type: ignore
         text,
         file_path=f"{filename}",
     )
