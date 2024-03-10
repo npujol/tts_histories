@@ -31,18 +31,25 @@ def test_default_tts_coqui_process(
 
 @pytest.mark.vcr()
 @pytest.mark.parametrize(
-    ("content", "language"),
+    ("name", "content", "language"),
     [
-        ("   Ejemplo con espacios    ", Language.SPANISH),
         (
+            "ejemplo1",
+            "   Ejemplo con espacios.    ",
+            Language.SPANISH,
+        ),
+        (
+            "ejemplo2",
             "   Ejemplo con espacios. Dos oraciones.    ",
             Language.SPANISH,
         ),
         (
+            "ejemplo3",
             "Un ejemplo limpio. Dos oraciones. Tres oraciones.",
             Language.SPANISH,
         ),
         (
+            "ejemplo4",
             "Un ejemplo limpio. Dos oraciones. . ... Tres oraciones.",
             Language.SPANISH,
         ),
@@ -50,6 +57,7 @@ def test_default_tts_coqui_process(
 )
 def test_clean_paragraph(
     raw_story: RawStory,
+    name: str,
     content: str,
     language: Language,
     snapshot: SnapshotFixture,
@@ -58,7 +66,7 @@ def test_clean_paragraph(
     raw_story.language = language
     handler = CoquiTTS(story=raw_story)
 
-    assert snapshot("json") == sorted(handler.clean_paragraphs())
+    assert snapshot(f"{name}.json") == sorted(handler.clean_paragraphs())
 
 
 @pytest.mark.skip("TODO wait to unlock google api")
@@ -68,9 +76,7 @@ def test_default_tts_google_process(
     raw_story: RawStory,
 ):
     out_path = tmp_path.joinpath("out.mp3")
-    result = process_story(
-        story=raw_story, out_path=out_path, tts_type=TTSType.GOOGlE
-    )
+    result = process_story(story=raw_story, out_path=out_path, tts_type=TTSType.GOOGlE)
     assert result
     assert out_path.is_file()
     out_path.unlink()
