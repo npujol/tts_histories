@@ -42,7 +42,7 @@ def send(path: Path) -> None:
 @click.option(
     "--out_path",
     type=Path,
-    default="/home/naivy/Datos/tts__file_output/",
+    default=CURRENT_PATH,
     prompt="Folder's path",
     help="Path for the output with the *.mp3 files",
 )
