@@ -9,7 +9,7 @@ logger = logging.getLogger(__file__)
 
 env = Env()
 env.read_env()
-channel_id = env.int("CHANNEL_ID", 0)  # type: ignore
+channel_id = env.int("TELEGRAM_CHANNEL_ID", 0)  # type: ignore
 config = loads((Path.home() / ".config/telegram-upload.json").read_text())
 
 
