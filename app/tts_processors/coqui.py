@@ -36,15 +36,15 @@ MAP_LANGUAGE_MODEL = {
         shall_add_speaker=True,
     ),
     Language.GERMAN: TTSModelConfig(
-        model_name="tts_models/multilingual/multi-dataset/xtts_v2",
-        sentence_count=1,
-        type=TTSModelType.MULTI,
+        model_name="tts_models/de/thorsten/tacotron2-DDC",
+        sentence_count=10,
+        type=TTSModelType.SINGLE,
         shall_add_speaker=True,
     ),
     Language.ENGLISH: TTSModelConfig(
-        model_name="tts_models/multilingual/multi-dataset/xtts_v2",
-        sentence_count=1,
-        type=TTSModelType.MULTI,
+        model_name="tts_models/en/ljspeech/glow-tts",
+        sentence_count=10,
+        type=TTSModelType.SINGLE,
         shall_add_speaker=True,
     ),
 }
@@ -107,6 +107,9 @@ class CoquiTTS(Base):
             args["language"] = self.story.language
         if self.model_config.shall_add_speaker:  # type: ignore
             args["speaker_wav"] = str(Path(__file__).parent.parent / "speakers/me.wav")
+            # TODO Review what is happening with the speakers here, it's not working
+            # when the language is english
+            # breakpoint()
 
         self.tts_handler.tts_with_vc_to_file(
             **args,
