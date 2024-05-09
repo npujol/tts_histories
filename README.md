@@ -63,3 +63,42 @@ TELEGRAM_CHANNEL_ID=-1000000000000
 [How to set up the Telegram handler?](https://github.com/Nekmo/telegram-upload)
 
 Credentials should be saved in ~/.config/telegram-upload.json and ~/.config/telegram-upload.session.
+
+## TTS Processors
+Available TTS Processors
+- [Coqui TTS](https://github.com/coqui-ai/TTS)
+- [Google TTS](https://github.com/pndurette/gTTS)
+
+### Coqui TTS
+The models for the languages are available in the `app/tts_processors/coqui.py` file.
+When is a language without a defined model, it will use the first available model.
+
+To add or override a defined model, add it in the `app/tts_processors/coqui.py` file.
+The structure of the new models should be, the language code as the key and the TTSModelConfig as the value.:
+```
+{
+	Language.SPANISH: TTSModelConfig(
+		model_name="tts_models/es/css10/vits",
+		sentence_count=10,
+		type=TTSModelType.SINGLE,
+		shall_add_speaker=True,
+	)
+}
+```
+**TTSModelConfig**
+
+|Name|Description|
+|---|---|
+|`model_name`| The name of the model. |
+|`sentence_count`| The number of sentences in the model. |
+|`type`| The type of the model, It could be `TTSModelType.SINGLE` or `TTSModelType.MULTI`. `MULTI` means that the model can be used for more that one language. |
+|`shall_add_speaker`| Whether to add the speaker to the model, this element override the original voice and use the voice of the given speaker. |
+
+**How to add a new speaker?**
+
+The new speaker voice file should be added in the folder [`app/tts_processors/speakers/`](./app/tts_processors/speakers/new_me.wav).
+
+### TODO
+- [ ] Include a environment variable to get the language setting from the user config file.
+- [ ] Add the `--speaker` option to get the speaker voice from the user config file.
+- [ ] Add the `--speaker_wav` option to get the speaker voice from the user config file.
