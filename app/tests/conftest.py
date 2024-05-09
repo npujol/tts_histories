@@ -3,9 +3,9 @@ import pytest
 from pathlib import Path
 
 
-REAL_AO3_URL = "https://archiveofourown.org/downloads/41826891/Complicidad.html?updated_at=1677757090"
-REAL_WATTPAD_URL = "https://www.wattpad.com/story/157495653-el-tren"
-REAL_WATTPAD_CHAPTER_URL = "https://www.wattpad.com/613460718-el-tren"
+REAL_AO3_URL = (
+    "https://archiveofourown.org/downloads/55724413/Video.html?updated_at=1715002036"
+)
 TEST_AO3_URL = "https://archiveofourown.org/works/123456"
 SIZE = 30
 RETRY_ATTEMPTS = 10
