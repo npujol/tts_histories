@@ -9,7 +9,7 @@ def read(file_name: str):
 setup(
     name="tts_stories",
     version="0.1",
-    description="Create TSS from txt or Wattpad stories",
+    description="Create TSS from txt",
     url="https://github.com/npujol/tts_stories",
     author="Naivy Pujol Méndez",
     author_email="naivy.luna@gmail.com",
