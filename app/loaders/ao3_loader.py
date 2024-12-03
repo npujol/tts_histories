@@ -12,7 +12,7 @@ import re
 logger = logging.getLogger(__file__)
 
 AO3_HOSTNAME = "archiveofourown.org"
-AO3_REGEX = re.compile(r"^\/downloads\/\d+/[a-zA-Z0-9%-]+\.html$")
+AO3_REGEX = re.compile(r"^\/downloads\/\d+\/[a-zA-Z0-9%-_]+.html.*")
 
 
 class AO3Loader(Base):
