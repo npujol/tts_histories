@@ -35,7 +35,8 @@ class WattpadLoader(Base):
         if response:
             content_soup = BeautifulSoup(response.content, "html.parser")
             title_soup = content_soup.find(
-                "div", attrs={"class": "story-info__title"}  # type: ignore
+                "div",
+                attrs={"class": "story-info__title"},  # type: ignore
             )
             if title is not None:
                 title = title_soup.text  # type: ignore

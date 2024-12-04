@@ -10,12 +10,10 @@ logger = logging.getLogger(__file__)
 
 class Base(ABC):
     @abstractmethod
-    def can_handle(self, source: str) -> bool:
-        ...
+    def can_handle(self, source: str) -> bool: ...
 
     @abstractmethod
-    def load(self, source: str) -> RawStory:
-        ...
+    def load(self, source: str) -> RawStory: ...
 
     def write(self, file_path: Path, content: str):
         logger.info(f"Writing to file {file_path} {len(content)} characters")

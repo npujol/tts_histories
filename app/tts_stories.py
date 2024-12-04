@@ -209,7 +209,9 @@ def create_coqui_tts(filename: Path, text: str, language: Language):
     model = MAP_LANGUAGE_MODEL.get(language, None)
     if model is None:
         list_models: list[str] = [
-            m for m in TTS.list_models() if f"/{language}/" in m  # type: ignore
+            m
+            for m in TTS.list_models()
+            if f"/{language}/" in m  # type: ignore
         ]
         if not list_models:
             return

@@ -48,5 +48,4 @@ class Base(ABC):
         return out_path
 
     @abstractmethod
-    def _make_tts(self, text: str, path: Path):
-        ...
+    def _make_tts(self, text: str, path: Path): ...
