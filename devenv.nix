@@ -28,6 +28,12 @@
   #   echo hello from $GREET
   # '';
 
+  enterShell = ''
+    # Workaround for language.python.library not working with uv
+    export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib/";
+    source $UV_PROJECT_ENVIRONMENT/bin/activate
+  '';
+
   env.LD_PRELOAD = "${pkgs.stdenv.cc.cc.lib}/lib/libstdc++.so.6";
   # enterShell = ''
   #   export LD_PRELOAD="$LD_PRELOAD:${pkgs.stdenv.cc.cc.lib}/lib/libstdc++.so.6"
